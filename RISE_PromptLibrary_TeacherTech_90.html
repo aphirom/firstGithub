@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RISE Prompt Library — ครูเทคโนโลยี ม.ปลาย (สพฐ.)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Prompt:wght@300;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e28;
+    --bg4: #202536;
+    --border: #2a2f42;
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #4f8ef7;
+
+    --cat1: #4f8ef7;
+    --cat2: #38c9a0;
+    --cat3: #f4a135;
+    --cat4: #e05c7a;
+
+    --green: #22c55e;
+    --green-dark: #16a34a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+  }
+
+  .header-left h1 {
+    font-family: 'Prompt', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .header-left span {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .btn-download {
+    background: var(--green);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .btn-download:hover { background: var(--green-dark); }
+
+  /* ─── CONTROLS ─── */
+  .controls {
+    padding: 18px 28px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 65px;
+    z-index: 90;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 14px 9px 38px;
+    border-radius: 8px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap .ico {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .filter-btn {
+    border: 1.5px solid;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .18s;
+    white-space: nowrap;
+  }
+  .filter-btn.all { border-color: var(--muted); color: var(--muted); }
+  .filter-btn.all.active { background: var(--muted); color: #000; }
+
+  .filter-btn.c1 { border-color: var(--cat1); color: var(--cat1); }
+  .filter-btn.c1.active { background: var(--cat1); color: #fff; }
+  .filter-btn.c2 { border-color: var(--cat2); color: var(--cat2); }
+  .filter-btn.c2.active { background: var(--cat2); color: #000; }
+  .filter-btn.c3 { border-color: var(--cat3); color: var(--cat3); }
+  .filter-btn.c3.active { background: var(--cat3); color: #000; }
+  .filter-btn.c4 { border-color: var(--cat4); color: var(--cat4); }
+  .filter-btn.c4.active { background: var(--cat4); color: #fff; }
+
+  /* ─── STATS ─── */
+  .stats-bar {
+    padding: 10px 28px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ─── GRID ─── */
+  .grid {
+    padding: 24px 28px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid;
+    border-radius: 10px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: transform .15s, background .15s, box-shadow .15s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+  .card:hover {
+    background: var(--bg3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  }
+  .card[data-cat="1"] { border-left-color: var(--cat1); }
+  .card[data-cat="2"] { border-left-color: var(--cat2); }
+  .card[data-cat="3"] { border-left-color: var(--cat3); }
+  .card[data-cat="4"] { border-left-color: var(--cat4); }
+
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    letter-spacing: .03em;
+  }
+  .card[data-cat="1"] .card-badge { background: rgba(79,142,247,.15); color: var(--cat1); }
+  .card[data-cat="2"] .card-badge { background: rgba(56,201,160,.15); color: var(--cat2); }
+  .card[data-cat="3"] .card-badge { background: rgba(244,161,53,.15); color: var(--cat3); }
+  .card[data-cat="4"] .card-badge { background: rgba(224,92,122,.15); color: var(--cat4); }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-num {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--border);
+  }
+
+  /* ─── MODAL ─── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.75);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 720px;
+    max-height: 88vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(.96);
+    transition: transform .2s;
+  }
+  .overlay.open .modal { transform: scale(1); }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg2);
+    z-index: 10;
+  }
+  .modal-header .modal-badge { margin-bottom: 8px; }
+  .modal-header h2 {
+    font-family: 'Prompt', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 18px; }
+
+  .rise-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .rise-label {
+    padding: 7px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: .08em;
+    border-bottom: 1px solid var(--border);
+  }
+  .rise-block:nth-child(1) .rise-label { color: var(--cat1); background: rgba(79,142,247,.07); }
+  .rise-block:nth-child(2) .rise-label { color: var(--cat2); background: rgba(56,201,160,.07); }
+  .rise-block:nth-child(3) .rise-label { color: var(--cat3); background: rgba(244,161,53,.07); }
+  .rise-block:nth-child(4) .rise-label { color: var(--cat4); background: rgba(224,92,122,.07); }
+
+  .rise-content {
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: #cdd0da;
+    white-space: pre-wrap;
+  }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .btn-close-modal {
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.85rem;
+    transition: background .15s;
+  }
+  .btn-close-modal:hover { background: var(--border); }
+
+  .btn-copy {
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s;
+  }
+  .btn-copy:hover { background: #3a7ce0; }
+  .btn-copy.copied { background: var(--green); }
+
+  .close-x {
+    position: absolute;
+    top: 16px; right: 18px;
+    background: none; border: none;
+    color: var(--muted); font-size: 1.2rem;
+    cursor: pointer; line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: color .15s;
+  }
+  .close-x:hover { color: var(--text); }
+
+  .empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>📚 RISE Prompt Library — ครูเทคโนโลยี ม.ปลาย</h1>
+    <span>สังกัด สพฐ. · 90 prompts · 4 หมวด</span>
+  </div>
+  <button class="btn-download" onclick="downloadHTML()">⬇ Download HTML</button>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="ico">🔍</span>
+    <input type="text" id="searchInput" placeholder="ค้นหา prompt..." oninput="filterCards()">
+  </div>
+  <div class="filters">
+    <button class="filter-btn all active" onclick="setFilter('all',this)">ทั้งหมด</button>
+    <button class="filter-btn c1" onclick="setFilter('1',this)">📋 วิเคราะห์หลักสูตร/แผนสอน</button>
+    <button class="filter-btn c2" onclick="setFilter('2',this)">🔬 วิจัยในชั้นเรียน</button>
+    <button class="filter-btn c3" onclick="setFilter('3',this)">🎨 สื่อการสอนเทคโนโลยี</button>
+    <button class="filter-btn c4" onclick="setFilter('4',this)">📝 แบบทดสอบ/แบบประเมิน</button>
+  </div>
+</div>
+
+<div class="stats-bar" id="statsBar">แสดง 90 / 90 prompts</div>
+
+<div class="grid" id="grid"></div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <div class="modal-header">
+      <div class="modal-badge" id="modalBadge"></div>
+      <h2 id="modalTitle"></h2>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-close-modal" onclick="closeModal()">ปิด</button>
+      <button class="btn-copy" id="copyBtn" onclick="copyPrompt()">📋 คัดลอก Prompt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CAT_NAMES = {
+  "1": "📋 วิเคราะห์หลักสูตร/แผนสอน",
+  "2": "🔬 วิจัยในชั้นเรียน",
+  "3": "🎨 สื่อการสอนเทคโนโลยี",
+  "4": "📝 แบบทดสอบ/แบบประเมิน"
+};
+
+const PROMPTS = [
+  // ═══════════════════════════════════════════
+  // หมวด 1: วิเคราะห์หลักสูตร / แผนการสอน (22 prompts)
+  // ═══════════════════════════════════════════
+  {
+    id:1, cat:"1",
+    title:"วิเคราะห์มาตรฐานและตัวชี้วัด วิชาเทคโนโลยี ม.ปลาย",
+    desc:"ถอดรหัสมาตรฐาน วท.1-3 และตัวชี้วัดช่วงชั้น ม.4-6 ให้เข้าใจง่าย",
+    role:"คุณคือผู้เชี่ยวชาญด้านหลักสูตรวิทยาศาสตร์เทคโนโลยี สพฐ. มีประสบการณ์วิเคราะห์มาตรฐานการเรียนรู้และตัวชี้วัดตามหลักสูตรแกนกลาง 2551 (ปรับปรุง 2560)",
+    input:"มาตรฐานการเรียนรู้และตัวชี้วัด วิชาเทคโนโลยี ม.ปลาย: [ระบุมาตรฐาน/ตัวชี้วัดที่ต้องการวิเคราะห์] ระดับชั้น: [ม.4 / ม.5 / ม.6] บริบทโรงเรียน: [ขนาด/สภาพแวดล้อม]",
+    steps:"1. ถอดความหมายมาตรฐานการเรียนรู้เป็นภาษาที่เข้าใจง่าย\n2. แยกย่อยตัวชี้วัดเป็น KSA (Knowledge, Skill, Attitude)\n3. เชื่อมโยงกับสมรรถนะสำคัญของผู้เรียนตามหลักสูตร\n4. ระบุระดับการคิดตาม Bloom's Taxonomy\n5. เสนอแนวทางการจัดการเรียนรู้ที่สอดคล้อง",
+    expect:"ตารางวิเคราะห์มาตรฐาน/ตัวชี้วัดพร้อมระดับการคิด Bloom's แนวทางการสอนที่ตรงกับบริบท ม.ปลาย สพฐ. และรายการหลักฐานการเรียนรู้ที่ควรเก็บรวบรวม"
+  },
+  {
+    id:2, cat:"1",
+    title:"ออกแบบโครงสร้างรายวิชา (Course Outline) เทคโนโลยี ม.ปลาย",
+    desc:"วางโครงสร้างรายวิชาพร้อมน้ำหนักชั่วโมงและหัวข้อที่สอดคล้องหลักสูตร",
+    role:"คุณคือหัวหน้ากลุ่มสาระฯ วิชาวิทยาศาสตร์และเทคโนโลยี ผู้เชี่ยวชาญการออกแบบโครงสร้างรายวิชาตามหลักสูตรแกนกลาง สพฐ.",
+    input:"รายวิชา: [ชื่อวิชา เช่น เทคโนโลยี (วิทยาการคำนวณ) หรือ เทคโนโลยีสารสนเทศ] ระดับชั้น: [ม.4/5/6] จำนวนชั่วโมง/ปี: [จำนวน] สัดส่วนคะแนน: [กำหนดเอง/มาตรฐาน]",
+    steps:"1. กำหนดจุดประสงค์รายวิชาจากมาตรฐานและตัวชี้วัด\n2. วิเคราะห์เนื้อหาสาระและจัดลำดับความยากง่าย\n3. จัดสรรชั่วโมงเรียนแต่ละหน่วย\n4. กำหนดงาน/ชิ้นงานและสัดส่วนการวัดผล\n5. ออกแบบตารางโครงสร้างรายวิชาที่สมบูรณ์",
+    expect:"Course Outline สมบูรณ์พร้อมตารางหน่วยการเรียนรู้ ชั่วโมง น้ำหนักคะแนน และชิ้นงาน พร้อม Rationale อธิบายเหตุผลการออกแบบ"
+  },
+  {
+    id:3, cat:"1",
+    title:"เขียนแผนการจัดการเรียนรู้ (แผนฯ) หน่วยการเรียนรู้เทคโนโลยี",
+    desc:"สร้างแผนการสอนมาตรฐาน สพฐ. ครบ 8 องค์ประกอบสำหรับวิชาเทคโนโลยี",
+    role:"คุณคือครูผู้เชี่ยวชาญการเขียนแผนการจัดการเรียนรู้ตามแนวทาง สพฐ. ที่มีประสบการณ์ผ่านการประเมินวิทยฐานะและได้รับรางวัลครูดีเด่น",
+    input:"หน่วยการเรียนรู้: [ชื่อหน่วย] เวลาเรียน: [จำนวนชั่วโมง] มาตรฐาน/ตัวชี้วัด: [ระบุ] วิธีการสอน: [Project-Based/Inquiry/STEM/อื่นๆ] สื่อและวัสดุ: [รายการ]",
+    steps:"1. เขียนสาระสำคัญและจุดประสงค์การเรียนรู้ (K, P, A)\n2. ออกแบบกิจกรรมการเรียนรู้แบบ Active Learning\n3. กำหนดสื่อ/แหล่งเรียนรู้ที่หลากหลาย\n4. ออกแบบการวัดและประเมินผลตรงตามจุดประสงค์\n5. เขียนบันทึกหลังการสอน (Template)\n6. ตรวจสอบความสอดคล้องทุกองค์ประกอบ",
+    expect:"แผนการจัดการเรียนรู้ครบ 8 องค์ประกอบตามมาตรฐาน สพฐ. พร้อมกิจกรรม Active Learning บูรณาการ STEM และแบบบันทึกหลังการสอน"
+  },
+  {
+    id:4, cat:"1",
+    title:"ออกแบบหน่วยการเรียนรู้แบบ Backward Design (UbD)",
+    desc:"วางแผนหน่วยเรียนรู้โดยเริ่มจากผลลัพธ์ที่ต้องการตามแนวทาง Understanding by Design",
+    role:"คุณคือผู้เชี่ยวชาญด้าน Curriculum Design ที่มีความรู้ลึกใน Backward Design / UbD Framework ของ Wiggins & McTighe และการประยุกต์ใช้ในบริบทการศึกษาไทย",
+    input:"หน่วยการเรียนรู้: [หัวข้อ] ระดับชั้น: [ม.ปลาย] ตัวชี้วัดหลัก: [ระบุ] ระยะเวลา: [จำนวนชั่วโมง] เป้าหมายความเข้าใจที่ยั่งยืน: [ระบุหรือให้ AI ช่วยกำหนด]",
+    steps:"1. กำหนด Desired Results: ตัวชี้วัด+ความเข้าใจที่ยั่งยืน+คำถามสำคัญ\n2. กำหนด Evidence of Learning: หลักฐานการเรียนรู้และเกณฑ์ประเมิน\n3. ออกแบบ Learning Plan: กิจกรรม WHERETO\n4. เชื่อมโยง Big Idea กับเนื้อหาเทคโนโลยี\n5. ตรวจสอบความสอดคล้อง 3 ขั้น",
+    expect:"แผน UbD 3 ขั้นตอนสมบูรณ์ ประกอบด้วย Desired Results, Acceptable Evidence, Learning Plan พร้อม Rubric ประเมินความเข้าใจ"
+  },
+  {
+    id:5, cat:"1",
+    title:"วิเคราะห์ผู้เรียนเพื่อออกแบบการสอนที่ตอบโจทย์",
+    desc:"วิเคราะห์พื้นฐาน ความต้องการ และบริบทผู้เรียน ม.ปลาย เพื่อปรับแผนการสอน",
+    role:"คุณคือนักจิตวิทยาการศึกษาและผู้เชี่ยวชาญ Differentiated Instruction ที่เข้าใจพัฒนาการของวัยรุ่น Generation Z และการออกแบบการสอนที่ตอบสนองความแตกต่างของผู้เรียน",
+    input:"ข้อมูลนักเรียน: [จำนวน/ระดับชั้น/ห้อง] ผลสัมฤทธิ์ปีที่ผ่านมา: [ระดับคะแนนเฉลี่ย/ปัญหาที่พบ] สภาพแวดล้อม: [เมือง/ชนบท, มีอุปกรณ์/ไม่มี] กลุ่มพิเศษ: [เด็กพิเศษ/ผู้มีความสามารถพิเศษ หากมี]",
+    steps:"1. วิเคราะห์ Learning Profile ของผู้เรียนตามข้อมูลที่ให้\n2. ระบุ Prior Knowledge และ Learning Gap\n3. จำแนกกลุ่มผู้เรียนตาม Readiness/Interest/Learning Style\n4. เสนอกลยุทธ์ Differentiated Instruction แต่ละกลุ่ม\n5. แนะนำ scaffold และ extension activities",
+    expect:"รายงานวิเคราะห์ผู้เรียน 3 กลุ่ม (เก่ง/ปานกลาง/อ่อน) พร้อมกลยุทธ์การสอนและกิจกรรมที่แตกต่างกัน และแผนการติดตามช่วยเหลือ"
+  },
+  {
+    id:6, cat:"1",
+    title:"บูรณาการหลักสูตร STEM/STEAM ในวิชาเทคโนโลยี",
+    desc:"ออกแบบการสอนเชิงบูรณาการ STEM เชื่อมวิชาเทคโนโลยีกับวิทยาศาสตร์-คณิตศาสตร์",
+    role:"คุณคือผู้เชี่ยวชาญ STEM Education ที่มีประสบการณ์ออกแบบ Project-Based Learning บูรณาการข้ามสาระวิชา และผ่านการอบรม STEM Academy สสวท.",
+    input:"โครงงาน/ปัญหาหลัก: [หัวข้อ] วิชาที่บูรณาการ: [เทคโนโลยี + วิชาอื่น] ระดับชั้น: [ม.ปลาย] ระยะเวลา: [สัปดาห์/ชั่วโมง] ทรัพยากรที่มี: [อุปกรณ์/งบประมาณ]",
+    steps:"1. กำหนด Driving Question ที่เชื่อมหลายวิชา\n2. ระบุมาตรฐาน/ตัวชี้วัดแต่ละวิชาที่บูรณาการ\n3. ออกแบบ Project Milestones และ Checkpoints\n4. วางแผนการทำงานร่วมกับครูวิชาอื่น\n5. ออกแบบการนำเสนอผลงาน/ชิ้นงาน\n6. กำหนดเกณฑ์ประเมิน STEM Practices",
+    expect:"แผนโครงงาน STEM บูรณาการ ระบุตัวชี้วัดทุกวิชา กำหนดงาน Timeline และ Rubric ประเมิน STEM Practices ที่ใช้ได้จริงใน ม.ปลาย"
+  },
+  {
+    id:7, cat:"1",
+    title:"ออกแบบแผนการสอน Computational Thinking ม.ปลาย",
+    desc:"วางแผนสอนทักษะการคิดเชิงคำนวณที่เป็นรากฐานของ CS/เทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Computer Science Education ที่เชี่ยวชาญการสอน Computational Thinking ตามกรอบ CSTA K-12 และ สสวท. พร้อมประสบการณ์ช่วยเหลือครูไทย",
+    input:"หัวข้อ CT ที่จะสอน: [Decomposition/Pattern Recognition/Abstraction/Algorithm] ระดับ: [ม.ปลาย] เวลา: [จำนวนชั่วโมง] บริบท: [มีคอมพิวเตอร์/ไม่มี, ใช้ภาษาโปรแกรม: Scratch/Python/อื่นๆ]",
+    steps:"1. กำหนดนิยามและหลักการ CT องค์ประกอบที่จะสอน\n2. ออกแบบกิจกรรม Unplugged Activities (ไม่ใช้คอม)\n3. ออกแบบกิจกรรม Digital (ใช้คอม/โปรแกรมมิ่ง)\n4. สร้าง Problem Set ระดับ scaffold → independent\n5. ออกแบบการประเมิน CT Competency",
+    expect:"แผนการสอน CT ครบทั้ง Unplugged และ Digital Activities พร้อมตัวอย่างปัญหาระดับต่างๆ และ Rubric วัด CT Skills ทั้ง 4 องค์ประกอบ"
+  },
+  {
+    id:8, cat:"1",
+    title:"จัดทำแผนการสอน Coding/Programming สำหรับ ม.ปลาย",
+    desc:"แผนการสอนการเขียนโปรแกรมอย่างเป็นระบบตั้งแต่พื้นฐานถึงระดับ ม.ปลาย",
+    role:"คุณคือครูสอนโปรแกรมมิ่งมืออาชีพที่มีประสบการณ์สอน Python/JavaScript/C++ และออกแบบหลักสูตร CS สำหรับมัธยมปลาย",
+    input:"ภาษาโปรแกรม: [Python/JavaScript/C++/อื่นๆ] ระดับผู้เรียน: [ไม่มีพื้นฐาน/มีพื้นฐาน] จำนวนชั่วโมง: [จำนวน] เป้าหมาย: [แข่งขัน/ใช้งานทั่วไป/งานอาชีพ] สภาพแวดล้อม: [IDE/Online editor]",
+    steps:"1. กำหนด Learning Progression ตั้งแต่พื้นฐานถึงขั้นสูง\n2. ออกแบบ Project-based โจทย์เชื่อมชีวิตจริง\n3. วางแผน Live Coding Demo และ Pair Programming\n4. ออกแบบ Code Review กระบวนการ\n5. กำหนด Mini Projects และ Capstone Project",
+    expect:"แผนการสอน Coding 15+ บทเรียนพร้อมโจทย์แต่ละระดับ Live Coding Script และ Capstone Project ที่นักเรียนนำไปใช้งานจริงได้"
+  },
+  {
+    id:9, cat:"1",
+    title:"วางแผนสอนหน่วย Data/AI Literacy ม.ปลาย",
+    desc:"ออกแบบการสอนความรู้ด้าน Data Science และ AI เบื้องต้นสำหรับมัธยมปลาย",
+    role:"คุณคือนักการศึกษาด้าน AI/Data Science ที่ผ่านการอบรม AI for K-12 CSTA และมีประสบการณ์ออกแบบหลักสูตร AI Literacy สำหรับโรงเรียนมัธยมไทย",
+    input:"หัวข้อ: [Data Literacy / ML Basics / AI Ethics / อื่นๆ] ระดับชั้น: [ม.4/5/6] เวลา: [ชั่วโมง] เครื่องมือ: [Google Teachable Machine / Scratch ML / Python Scikit / อื่นๆ]",
+    steps:"1. ออกแบบ Storyline เชื่อมโยง AI กับชีวิตประจำวัน\n2. วางลำดับแนวคิด: Data → Model → Prediction → Ethics\n3. สร้างกิจกรรม Hands-on ด้วยเครื่องมือที่เหมาะสม\n4. บูรณาการ AI Ethics และ Critical Thinking\n5. ออกแบบ Portfolio Assessment",
+    expect:"แผนหน่วยการเรียนรู้ AI/Data ครบถ้วน พร้อมกิจกรรม hands-on, project ideas, discussion questions ด้าน Ethics และ rubric ประเมิน AI Literacy"
+  },
+  {
+    id:10, cat:"1",
+    title:"สร้างแผนการสอนแบบ Project-Based Learning (PBL) วิชาเทคโนโลยี",
+    desc:"ออกแบบโครงงานที่แท้จริงสำหรับการเรียนรู้วิชาเทคโนโลยีแบบ Active Learning",
+    role:"คุณคือผู้เชี่ยวชาญ PBL Design ที่ผ่านการรับรองจาก Buck Institute for Education และมีผลงานออกแบบโครงงานให้โรงเรียนมัธยมไทย",
+    input:"วิชา/หน่วยการเรียนรู้: [ระบุ] ระดับชั้น: [ม.ปลาย] ระยะเวลา: [สัปดาห์] ปัญหา/บริบทในชุมชน: [ระบุปัญหาจริง] ทรัพยากร: [อุปกรณ์/งบประมาณ/ผู้เชี่ยวชาญ]",
+    steps:"1. สร้าง Entry Event ที่กระตุ้นความสงสัย\n2. กำหนด Driving Question ระดับ Higher Order\n3. วาง Milestones 4-6 จุดพร้อม Checkpoints\n4. ออกแบบกระบวนการ Critique & Revision\n5. วางแผน Public Exhibition of Learning\n6. ออกแบบ Reflection กระบวนการ",
+    expect:"แผน PBL สมบูรณ์ตาม Gold Standard PBL Framework ของ BIE ประกอบด้วย Entry Event, Driving Question, Milestones, Rubric และแผนการนำเสนอ"
+  },
+  {
+    id:11, cat:"1",
+    title:"จัดทำแผนการสอน Cybersecurity Awareness ม.ปลาย",
+    desc:"แผนสอนความปลอดภัยทางไซเบอร์ที่สอดคล้องกับชีวิตจริงของวัยรุ่น",
+    role:"คุณคือผู้เชี่ยวชาญ Cybersecurity Education ที่มีใบรับรอง CompTIA Security+ และประสบการณ์สอนความปลอดภัยไซเบอร์ในระดับมัธยมไทย",
+    input:"หัวข้อ: [Phishing/Password Security/Social Engineering/Privacy/Digital Footprint] ระดับ: [ม.ปลาย] เวลา: [ชั่วโมง] บริบท: [Social Media ที่นักเรียนใช้] กฎหมายที่เกี่ยวข้อง: [พ.ร.บ.คอมพิวเตอร์ 2560]",
+    steps:"1. ออกแบบ Case Study จากเหตุการณ์จริงในไทย\n2. สร้างกิจกรรม Role-Play Simulation การโจมตีทางไซเบอร์\n3. วางแผนสอน Best Practices และเครื่องมือป้องกัน\n4. เชื่อมโยงกฎหมาย พ.ร.บ. คอมพิวเตอร์ไทย\n5. ออกแบบ Security Audit ชีวิตดิจิทัลของนักเรียน",
+    expect:"แผนการสอน Cybersecurity ที่มี Case Studies ไทย, Simulation Activity, Checklist ความปลอดภัย และ Quiz ทดสอบความรู้ด้านกฎหมายไซเบอร์"
+  },
+  {
+    id:12, cat:"1",
+    title:"ออกแบบแผนสอนหัวข้อ IoT (Internet of Things) ม.ปลาย",
+    desc:"แผนการเรียนรู้เรื่อง IoT ตั้งแต่แนวคิดถึง Prototype ด้วย Microcontroller",
+    role:"คุณคือวิศวกรและครูสอน IoT ที่มีประสบการณ์ใช้ Arduino, Raspberry Pi และ ESP32 ในการสอนมัธยมปลาย พร้อมออกแบบ Project ที่นักเรียนทำได้จริง",
+    input:"อุปกรณ์ที่มี: [Arduino/ESP32/Raspberry Pi] Sensors ที่มี: [รายการ] ระดับความรู้เดิม: [เขียนโปรแกรมได้/ไม่ได้] ระยะเวลา: [ชั่วโมง] โครงงาน: [Smart Classroom/Smart Farm/อื่นๆ]",
+    steps:"1. ออกแบบ Learning Path: Hardware → Sensor → Code → Connect → Deploy\n2. สร้างโจทย์ Hands-on ระดับต่ำ–สูง\n3. วางแผน Prototype Cycle (Build-Test-Iterate)\n4. เชื่อมโยงกับ Real World Use Case ที่นักเรียนรู้จัก\n5. ออกแบบการนำเสนอโครงงาน IoT Final Project",
+    expect:"แผนการสอน IoT แบบ Project-Based มี Learning Path ชัดเจน, โจทย์ hands-on ทุกระดับ, Template Code เริ่มต้น และ Rubric ประเมิน IoT Project"
+  },
+  {
+    id:13, cat:"1",
+    title:"จัดทำแผนสอนออกแบบและพัฒนาเว็บไซต์ ม.ปลาย",
+    desc:"แผนสอน Web Development ตั้งแต่ HTML/CSS ถึง Responsive Design",
+    role:"คุณคือ Web Developer ผู้มีประสบการณ์สอน HTML, CSS, JavaScript ให้นักเรียนมัธยมผ่านโครงการต่างๆ และเข้าใจบริบทห้องเรียนไทย",
+    input:"เนื้อหาหลัก: [HTML5/CSS3/JavaScript/Framework] ระดับ: [ม.ปลาย] ชั่วโมง: [จำนวน] เป้าหมายชิ้นงาน: [Personal Website/Community Site/School Project] เครื่องมือ: [VS Code/Replit/CodePen]",
+    steps:"1. วางลำดับเนื้อหา HTML → CSS → Layout → JavaScript → Deploy\n2. สร้าง Mini Projects ทุก Topic\n3. ออกแบบ Portfolio Website เป็น Capstone\n4. วางแผน Peer Review กระบวนการ\n5. เชื่อมโยง Accessibility และ Responsive Design",
+    expect:"แผนสอน Web Dev ครบ พร้อม Starter Template ทุกบทเรียน, Mini Project Tasks, Capstone Project Brief และ Portfolio Rubric"
+  },
+  {
+    id:14, cat:"1",
+    title:"วิเคราะห์และจัดทำแผนสอนดิจิทัลมีเดีย (Digital Media)",
+    desc:"ออกแบบการสอนด้านสื่อดิจิทัล: Photography, Video, Graphic Design สำหรับ ม.ปลาย",
+    role:"คุณคือผู้เชี่ยวชาญสื่อดิจิทัลและการศึกษาที่มีประสบการณ์สอน Media Literacy, Photo/Video Production และ Graphic Design ในระดับมัธยม",
+    input:"สื่อที่สอน: [Photography/Video Production/Graphic Design/Podcast/ครบทุกอย่าง] ซอฟต์แวร์: [Canva/Adobe Express/CapCut/DaVinci/Photoshop] ชั่วโมง: [จำนวน] งานสุดท้าย: [Multimedia Project Brief]",
+    steps:"1. ออกแบบ Media Production Workflow เป็น Framework สอน\n2. สร้าง Skill Ladder จากง่ายไปยาก\n3. วางแผน Production Lab Sessions\n4. บูรณาการ Copyright และ Digital Ethics\n5. ออกแบบการนำเสนอ Portfolio สุดท้าย",
+    expect:"แผนการสอน Digital Media ครบ พร้อม Production Workflow, ตัวอย่างชิ้นงานมาตรฐาน, Checklist ทักษะ และ Portfolio Showcase Plan"
+  },
+  {
+    id:15, cat:"1",
+    title:"จัดทำปฏิทินการสอนประจำปีวิชาเทคโนโลยี",
+    desc:"วางแผนปฏิทินการสอนทั้งปีที่สอดคล้องกับปฏิทินโรงเรียนและกิจกรรมต่างๆ",
+    role:"คุณคือครูอาวุโสที่มีประสบการณ์บริหารจัดการเวลาการสอนในสภาวะที่มีกิจกรรมโรงเรียน วันหยุด และเหตุฉุกเฉินต่างๆ ที่ทำให้แผนการสอนต้องยืดหยุ่น",
+    input:"ปีการศึกษา: [ภาคเรียน/ปีการศึกษา] ชั่วโมงสอน/สัปดาห์: [จำนวน] กิจกรรมโรงเรียนที่ทราบล่วงหน้า: [สอบกลางภาค/ปลายภาค/วันกีฬา/อื่นๆ] หน่วยการเรียนรู้: [รายการ]",
+    steps:"1. นับชั่วโมงสอนจริงหักวันหยุดและกิจกรรม\n2. จัดสรรชั่วโมงแต่ละหน่วยตามความสำคัญ\n3. วางแผน Buffer Weeks สำหรับเนื้อหาล้า\n4. กำหนด Review Week ก่อนสอบ\n5. สร้างปฏิทิน Visual ที่แชร์ได้",
+    expect:"ปฏิทินการสอนรายสัปดาห์ทั้งปีในรูปตาราง พร้อม milestone สำคัญ, buffer weeks, สัปดาห์ทบทวนก่อนสอบ และหมายเหตุชั่วโมงสำรอง"
+  },
+  {
+    id:16, cat:"1",
+    title:"ออกแบบกิจกรรม Active Learning วิชาเทคโนโลยี ม.ปลาย",
+    desc:"สร้างกิจกรรมการเรียนรู้เชิงรุกที่กระตุ้นความคิดขั้นสูงและมีส่วนร่วม",
+    role:"คุณคือผู้เชี่ยวชาญด้าน Active Learning และ Student Engagement ที่มีประสบการณ์ออกแบบกิจกรรมสำหรับห้องเรียนมัธยมปลายไทย",
+    input:"หัวข้อ/ทักษะ: [ระบุ] ระดับชั้น: [ม.ปลาย] จำนวนนักเรียน: [จำนวน] เวลา: [ชั่วโมง] วัตถุประสงค์การเรียนรู้: [ระบุ] อุปกรณ์ที่มี: [ระบุ]",
+    steps:"1. เลือกรูปแบบ Active Learning ที่เหมาะสม (Jigsaw/Think-Pair-Share/Case Study/Simulation)\n2. ออกแบบ Entry Activity ดึงดูดความสนใจ\n3. วางแผนกิจกรรมหลัก 3 ขั้น (Explore-Explain-Elaborate)\n4. ออกแบบ Formative Check ระหว่างกิจกรรม\n5. สร้าง Closure Activity สรุปการเรียนรู้",
+    expect:"แผนกิจกรรม Active Learning ครบถ้วนพร้อม Instruction Sheet สำหรับนักเรียน, Teacher Guide, Materials List และ Assessment Checklist"
+  },
+  {
+    id:17, cat:"1",
+    title:"พัฒนาแผนการสอนสำหรับนักเรียนที่มีความต้องการพิเศษ (Inclusive Education)",
+    desc:"ปรับแผนการสอนวิชาเทคโนโลยีให้รองรับนักเรียนที่มีความต้องการพิเศษ",
+    role:"คุณคือผู้เชี่ยวชาญการศึกษาพิเศษและ Universal Design for Learning (UDL) ที่เชี่ยวชาญการปรับกิจกรรมและสื่อการสอนให้รองรับความหลากหลายของผู้เรียน",
+    input:"ประเภทความต้องการพิเศษ: [บกพร่องทางการเรียนรู้/LD/ADHD/ออทิสติก/พิการทางการเคลื่อนไหว] หน่วยการเรียนรู้: [ระบุ] ทรัพยากรที่โรงเรียนมี: [ครูพิเศษ/สิ่งอำนวยความสะดวก] แผน IEP: [มี/ไม่มี]",
+    steps:"1. วิเคราะห์ Barrier to Learning ของนักเรียนแต่ละประเภท\n2. ปรับ Representation (นำเสนอหลายรูปแบบ)\n3. ปรับ Action & Expression (แสดงออกหลายวิธี)\n4. ปรับ Engagement (กระตุ้นหลากหลาย)\n5. สร้าง Accommodation Checklist",
+    expect:"แผนการสอน Inclusive Education ตาม UDL Framework พร้อม Accommodation List, Modified Activities, Alternative Assessment และ IEP Support Plan"
+  },
+  {
+    id:18, cat:"1",
+    title:"ออกแบบการสอนเรื่อง Digital Citizenship & Ethics",
+    desc:"แผนสอนจริยธรรมดิจิทัลและการเป็นพลเมืองดิจิทัลสำหรับ ม.ปลาย",
+    role:"คุณคือผู้เชี่ยวชาญ Digital Citizenship Education ที่ผ่านการอบรม Common Sense Media Digital Citizenship Program และเข้าใจปัญหา Cyberbullying, Fake News และ Privacy ในบริบทวัยรุ่นไทย",
+    input:"หัวข้อ: [Digital Footprint/Cyberbullying/Fake News/Online Privacy/Screen Time/Copyright] ระดับ: [ม.ปลาย] กลุ่มเป้าหมาย: [นักเรียน/ผู้ปกครอง/ชุมชน] สื่อ Social ที่เน้น: [TikTok/Instagram/YouTube/LINE]",
+    steps:"1. ออกแบบ Authentic Dilemma Cases จากชีวิตจริงนักเรียน\n2. วางแผนกิจกรรม Socratic Seminar ถกปัญหาจริยธรรม\n3. สร้าง Digital Footprint Audit Activity\n4. เชื่อมโยงกฎหมาย PDPA และ พ.ร.บ. คอมพิวเตอร์\n5. ออกแบบ Community Action Project",
+    expect:"แผนการสอน Digital Citizenship ครบ 6 หัวข้อหลัก Common Sense, Case Studies ไทย, Discussion Protocol, Digital Pledge และ Parent Engagement Plan"
+  },
+  {
+    id:19, cat:"1",
+    title:"จัดทำแผนสอนการใช้ AI Tools อย่างสร้างสรรค์และมีจริยธรรม",
+    desc:"ออกแบบการสอนให้นักเรียนใช้ AI เป็นเครื่องมือการเรียนรู้อย่างมีวิจารณญาณ",
+    role:"คุณคือผู้เชี่ยวชาญด้าน AI Literacy ในการศึกษา ที่ผ่านการอบรม AI for Education จาก UNESCO/Google และมีประสบการณ์ออกแบบหลักสูตร AI Literacy ในโรงเรียนไทย",
+    input:"เครื่องมือ AI ที่จะสอน: [ChatGPT/Gemini/Claude/Copilot] วัตถุประสงค์: [สร้างสรรค์งาน/วิจัย/แก้ปัญหา] ระดับ: [ม.ปลาย] ความกังวล: [Academic Integrity/Copyright/Bias]",
+    steps:"1. สอน How AI Works (เบื้องต้น ไม่ลึกเกินไป)\n2. ออกแบบกิจกรรม Prompt Engineering ระดับ ม.ปลาย\n3. วางแผนถกเรื่อง AI Ethics และ Academic Integrity\n4. สร้าง Framework การใช้ AI อย่างถูกต้อง\n5. ออกแบบ AI-Assisted Project ที่มี Human Judgment",
+    expect:"แผนการสอน AI Literacy ครบ ประกอบด้วย How AI Works Explainer, Prompt Engineering Lab, Ethics Discussion Protocol, AI Use Policy Template และ AI-Assisted Project Brief"
+  },
+  {
+    id:20, cat:"1",
+    title:"วิเคราะห์ผลการเรียนรู้เพื่อปรับแผนการสอน (Data-Driven Teaching)",
+    desc:"ใช้ข้อมูลผลการเรียนวิเคราะห์จุดอ่อน-แข็งเพื่อปรับแผนการสอนอย่างมีประสิทธิภาพ",
+    role:"คุณคือผู้เชี่ยวชาญ Educational Data Analysis และ Formative Assessment ที่ช่วยครูแปลผลข้อมูลนักเรียนให้เป็น Actionable Insights สำหรับการปรับการสอน",
+    input:"ข้อมูลที่มี: [คะแนนสอบ/แบบฝึกหัด/ชิ้นงาน] รายการหัวข้อ: [ระบุ] คะแนนรวมชั้น: [ช่วงคะแนน/ค่าเฉลี่ย] กลุ่มที่น่ากังวล: [จำนวนนักเรียน] เวลาที่เหลือ: [สัปดาห์]",
+    steps:"1. วิเคราะห์ Error Pattern จากข้อมูลที่ให้\n2. จำแนกหัวข้อที่นักเรียนส่วนใหญ่ยังไม่เข้าใจ\n3. กำหนดลำดับความสำคัญในการแก้ไข\n4. เสนอ Intervention Strategies ที่เฉพาะเจาะจง\n5. ออกแบบ Progress Monitoring Plan",
+    expect:"รายงานวิเคราะห์ข้อมูลการเรียนพร้อม Heat Map หัวข้อที่เป็นปัญหา, แผน Intervention รายกลุ่ม, กิจกรรมแก้ไขเฉพาะจุด และ Tracking Sheet ติดตามความก้าวหน้า"
+  },
+  {
+    id:21, cat:"1",
+    title:"ออกแบบการสอนผ่านกิจกรรมการแข่งขัน (Competitive Learning)",
+    desc:"วางแผนการเรียนรู้ผ่านการแข่งขัน Coding, Robotics, IT Olympiad สำหรับ ม.ปลาย",
+    role:"คุณคือโค้ชทีมแข่งขัน IT ที่มีประสบการณ์เตรียมนักเรียนสู่การแข่ง สอวน./สสวท./NSC/CodeCamp/Hackathon และเข้าใจเส้นทางพัฒนาทักษะสู่การแข่งขันระดับชาติ",
+    input:"การแข่งขันเป้าหมาย: [สอวน.ฯ/NSC/IOI/อื่นๆ] ระดับนักเรียน: [ปัจจุบัน] เวลาเตรียมตัว: [สัปดาห์/เดือน] จุดอ่อนหลัก: [Algorithm/DS/Math/อื่นๆ] เวลาฝึก/สัปดาห์: [ชั่วโมง]",
+    steps:"1. วิเคราะห์ Syllabus การแข่งขันและรูปแบบข้อสอบ\n2. สร้าง Skill Map จากปัจจุบันถึงเป้าหมาย\n3. ออกแบบตาราง Training Schedule\n4. วางแผน Mock Contest และ Post-Mortem\n5. ออกแบบ Mental Training และ Time Management",
+    expect:"Training Plan ครบถ้วนสำหรับการแข่งขัน มี Skill Map, Week-by-Week Schedule, Problem Set Recommendation, Mock Contest Plan และ Mental Preparation Guide"
+  },
+  {
+    id:22, cat:"1",
+    title:"จัดทำแผนสอนหัวข้อ Cloud Computing & Digital Infrastructure",
+    desc:"ออกแบบการสอนเรื่อง Cloud, Server, Network สำหรับ ม.ปลาย",
+    role:"คุณคือผู้เชี่ยวชาญ Cloud Computing ที่มีประสบการณ์สอนเรื่อง AWS/GCP/Azure ในระดับมัธยมและ intro-level อุดมศึกษา พร้อมทำ Hands-on Lab ด้วย Free Tier",
+    input:"หัวข้อ Cloud: [Storage/Compute/Network/SaaS/PaaS/IaaS] ระดับ: [ม.ปลาย/ไม่มีพื้นฐาน] ชั่วโมง: [จำนวน] Platform ที่ใช้: [AWS Free Tier/GCP Free/Replit/อื่นๆ]",
+    steps:"1. เริ่มจาก Analogy ที่นักเรียน ม.ปลาย เข้าใจได้\n2. ออกแบบ Lab ที่ใช้ Free Tier Services จริง\n3. เชื่อมโยง Cloud กับ App ที่นักเรียนใช้ประจำ\n4. วางแผน Mini Project Deploy บน Cloud\n5. บูรณาการ Security และ Cost Awareness",
+    expect:"แผนการสอน Cloud Computing สำหรับ ม.ปลาย มี Analogy Cards, Lab Instructions ทีละขั้นตอน, Mini Project Brief และ Cloud Cost Calculator Activity"
+  },
+
+  // ═══════════════════════════════════════════
+  // หมวด 2: วิจัยในชั้นเรียน (22 prompts)
+  // ═══════════════════════════════════════════
+  {
+    id:23, cat:"2",
+    title:"ระบุปัญหาวิจัยในชั้นเรียนวิชาเทคโนโลยี",
+    desc:"ช่วยครูค้นหาและกำหนดปัญหาวิจัยที่มีความหมายและแก้ไขได้จริง",
+    role:"คุณคือนักวิจัยการศึกษาที่มีประสบการณ์ทำวิจัยในชั้นเรียนมากกว่า 50 เรื่อง และเป็นที่ปรึกษาวิทยฐานะให้ครูหลายร้อยคน เข้าใจบริบทการทำวิจัยในโรงเรียน สพฐ.",
+    input:"ปัญหาที่สังเกตพบในห้องเรียน: [ระบุ] วิชา/ระดับชั้น: [เทคโนโลยี ม.ปลาย] ทรัพยากรในการวิจัย: [เวลา/งบประมาณ/ความสามารถ] ระยะเวลาทำวิจัย: [ภาคเรียน/ปี]",
+    steps:"1. วิเคราะห์ปัญหาที่ระบุว่าเป็นปัญหาวิจัยได้หรือไม่\n2. ระบุขอบเขตและตัวแปรที่ควบคุมได้\n3. กำหนดหัวข้อวิจัย 3-5 ตัวเลือกที่ทำได้จริง\n4. ประเมินความเป็นไปได้ในบริบท สพฐ.\n5. แนะนำหัวข้อที่ดีที่สุดพร้อมเหตุผล",
+    expect:"รายการหัวข้อวิจัย 3-5 ตัวเลือก พร้อมเหตุผลความเหมาะสม ขอบเขตการวิจัย และการประเมินความเป็นไปได้ด้านเวลา/ทรัพยากร"
+  },
+  {
+    id:24, cat:"2",
+    title:"เขียนโครงร่างงานวิจัยในชั้นเรียน (Research Proposal)",
+    desc:"จัดทำโครงร่างวิจัยในชั้นเรียนวิชาเทคโนโลยีที่สมบูรณ์และผ่านการตรวจสอบได้",
+    role:"คุณคือที่ปรึกษาวิจัยการศึกษาที่มีประสบการณ์เขียนและตรวจโครงร่างวิจัยในชั้นเรียนระดับ สพฐ. เข้าใจรูปแบบที่ถูกต้องตาม APA 7th และมาตรฐาน คศ.3/คศ.4",
+    input:"หัวข้อวิจัย: [ระบุ] ปัญหา: [อธิบายปัญหาที่พบ] นวัตกรรม/สิ่งที่จะทดลอง: [ระบุ] กลุ่มเป้าหมาย: [ระดับชั้น/จำนวน] ภาคเรียน: [ระบุ]",
+    steps:"1. เขียนบทนำ: ความเป็นมาและความสำคัญของปัญหา\n2. กำหนดวัตถุประสงค์และคำถามวิจัย\n3. นิยามศัพท์เฉพาะ\n4. วางแผนการดำเนินการวิจัย\n5. กำหนดเครื่องมือวิจัยและการวัดผล\n6. ระบุการวิเคราะห์ข้อมูล",
+    expect:"โครงร่างวิจัยในชั้นเรียนสมบูรณ์ตามรูปแบบ สพฐ. ครบทุกส่วน ตั้งแต่บทนำถึงแผนการดำเนินงาน พร้อม Gantt Chart ตารางเวลาทำวิจัย"
+  },
+  {
+    id:25, cat:"2",
+    title:"ออกแบบเครื่องมือวิจัย: แบบสังเกต แบบสัมภาษณ์",
+    desc:"สร้างเครื่องมือเก็บข้อมูลเชิงคุณภาพสำหรับวิจัยในชั้นเรียนเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญการวิจัยเชิงคุณภาพที่เชี่ยวชาญการออกแบบ Observation Protocol, Interview Guide และ Focus Group Discussion สำหรับการวิจัยในชั้นเรียน",
+    input:"วัตถุประสงค์วิจัย: [ระบุ] ตัวแปรที่ต้องการวัด: [ระบุ] กลุ่มเป้าหมาย: [นักเรียน/ครู/ผู้ปกครอง] บริบท: [ห้องเรียนเทคโนโลยี ม.ปลาย]",
+    steps:"1. ออกแบบแบบสังเกตพฤติกรรมพร้อม Rating Scale\n2. สร้าง Interview Protocol แบบ Semi-structured\n3. กำหนดประเด็นสำคัญที่ต้องสังเกต/ถาม\n4. ทดสอบ Validity ของเครื่องมือ\n5. สร้างคู่มือการใช้เครื่องมือ",
+    expect:"ชุดเครื่องมือวิจัย: แบบสังเกตพร้อม Rubric, แบบสัมภาษณ์ Semi-structured, Focus Group Guide และคู่มือการใช้เครื่องมือ"
+  },
+  {
+    id:26, cat:"2",
+    title:"ออกแบบเครื่องมือวิจัย: แบบสอบถามวิจัยในชั้นเรียน",
+    desc:"สร้างแบบสอบถามที่มีคุณภาพสำหรับวิจัยในชั้นเรียนวิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญการสร้างแบบวัดทางการศึกษาที่มีความรู้ด้าน Reliability, Validity และ Scale Construction ตามมาตรฐานการวิจัยการศึกษา",
+    input:"ตัวแปรที่วัด: [ความพึงพอใจ/ทัศนคติ/พฤติกรรม/ความรู้] นวัตกรรมที่ทดลอง: [สื่อ/กิจกรรม/วิธีสอน] Scale ที่ใช้: [Likert 5/3 ระดับ] จำนวนข้อ: [ต้องการ]",
+    steps:"1. กำหนด Construct และ Dimension ที่จะวัด\n2. เขียนข้อคำถามแต่ละ Dimension\n3. ออกแบบ Scale และ Scoring Guide\n4. ตรวจสอบความครอบคลุม Content Validity\n5. กำหนดวิธีหา Reliability (Cronbach's Alpha)\n6. สร้าง Instructions ที่ชัดเจน",
+    expect:"แบบสอบถามวิจัยสมบูรณ์ พร้อม Dimension Table, ข้อคำถาม 20-30 ข้อ, Scoring Guide, วิธีวิเคราะห์ความเชื่อมั่น และ Pilot Test Plan"
+  },
+  {
+    id:27, cat:"2",
+    title:"เขียนบทที่ 1 งานวิจัยในชั้นเรียน (บทนำ)",
+    desc:"เขียนบทนำงานวิจัยในชั้นเรียนวิชาเทคโนโลยีที่น่าสนใจและครบถ้วน",
+    role:"คุณคือนักเขียนงานวิจัยการศึกษาที่มีประสบการณ์เขียนและแก้ไขบทนำงานวิจัยมากกว่า 200 เรื่อง เข้าใจรูปแบบที่คณะกรรมการ สพฐ. และ คศ. ต้องการ",
+    input:"หัวข้อวิจัย: [ระบุ] ปัญหาในชั้นเรียน: [อธิบายละเอียด] นวัตกรรม: [ระบุ] ผลที่คาดหวัง: [ระบุ] ทฤษฎีที่อ้างอิง: [ระบุหากมี]",
+    steps:"1. เขียนความเป็นมาและความสำคัญของปัญหา (เชื่อมโยงนโยบาย สพฐ.)\n2. ระบุวัตถุประสงค์ของการวิจัย\n3. กำหนดขอบเขตการวิจัย\n4. นิยามศัพท์เฉพาะ\n5. ระบุประโยชน์ที่คาดว่าจะได้รับ",
+    expect:"บทที่ 1 งานวิจัยสมบูรณ์ ครบ 5 ส่วนหลัก เขียนด้วยภาษาวิชาการที่ถูกต้อง เชื่อมโยงนโยบายการศึกษาไทย และมีความยาวเหมาะสม"
+  },
+  {
+    id:28, cat:"2",
+    title:"เขียนบทที่ 2 งานวิจัย: เอกสารและงานวิจัยที่เกี่ยวข้อง",
+    desc:"สังเคราะห์เอกสารและงานวิจัยที่เกี่ยวข้องสำหรับวิจัยในชั้นเรียนเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญการสืบค้นและสังเคราะห์งานวิจัยการศึกษา มีทักษะการเชื่อมโยงทฤษฎีกับงานวิจัยที่เกี่ยวข้องทั้งในและต่างประเทศ",
+    input:"หัวข้อวิจัย: [ระบุ] นวัตกรรม/สิ่งที่ทดลอง: [ระบุ] ทฤษฎีหลักที่เกี่ยวข้อง: [เช่น Constructivism/Bloom's/TPACK] งานวิจัยที่มีอยู่แล้ว: [ระบุหากมี]",
+    steps:"1. รวบรวมทฤษฎีและแนวคิดหลักที่เกี่ยวข้อง\n2. สังเคราะห์งานวิจัยที่เกี่ยวข้อง (ไทยและต่างประเทศ)\n3. เชื่อมโยงทฤษฎีกับนวัตกรรมที่ทดลอง\n4. สร้าง Conceptual Framework\n5. เขียน Literature Review เชิงวิเคราะห์",
+    expect:"บทที่ 2 งานวิจัยสมบูรณ์ มีการอ้างอิงทฤษฎีหลัก งานวิจัยที่เกี่ยวข้อง 10+ เรื่อง Conceptual Framework และการสังเคราะห์ที่เชื่อมโยงสู่หัวข้อวิจัย"
+  },
+  {
+    id:29, cat:"2",
+    title:"ออกแบบวิธีดำเนินการวิจัย (บทที่ 3) ในชั้นเรียนเทคโนโลยี",
+    desc:"วางแผนระเบียบวิธีวิจัยอย่างเป็นระบบและปฏิบัติได้จริงในบริบท สพฐ.",
+    role:"คุณคือผู้เชี่ยวชาญระเบียบวิธีวิจัยการศึกษาที่เข้าใจการวิจัยเชิงปฏิบัติการ (Action Research) และการวิจัยในชั้นเรียนในบริบทโรงเรียนไทย",
+    input:"รูปแบบวิจัย: [วิจัยในชั้นเรียน/Action Research] กลุ่มตัวอย่าง: [ระดับชั้น/จำนวน] เครื่องมือ: [แบบสอบถาม/แบบสังเกต/แบบทดสอบ] ระยะเวลา: [ภาคเรียน] สถิติที่ใช้: [ระบุหรือให้แนะนำ]",
+    steps:"1. กำหนดรูปแบบการวิจัยและเหตุผล\n2. ระบุประชากรและกลุ่มตัวอย่าง\n3. อธิบายนวัตกรรม/สิ่งที่ทดลองใช้\n4. อธิบายเครื่องมือวิจัยและการตรวจสอบคุณภาพ\n5. อธิบายวิธีเก็บข้อมูลและวิเคราะห์ข้อมูล\n6. อธิบายสถิติที่ใช้",
+    expect:"บทที่ 3 งานวิจัยสมบูรณ์ครบ 6 ส่วน เขียนเป็นขั้นตอนที่ปฏิบัติได้จริง มีตาราง Timeline และอธิบายสถิติที่ใช้ในการวิเคราะห์ข้อมูลอย่างชัดเจน"
+  },
+  {
+    id:30, cat:"2",
+    title:"วิเคราะห์และนำเสนอผลการวิจัยในชั้นเรียน (บทที่ 4)",
+    desc:"ช่วยวิเคราะห์ข้อมูลและเขียนนำเสนอผลวิจัยในชั้นเรียนวิชาเทคโนโลยี",
+    role:"คุณคือนักสถิติการศึกษาและผู้เชี่ยวชาญการวิเคราะห์ข้อมูลวิจัยชั้นเรียน ที่ช่วยครูแปลผลข้อมูลให้เป็นภาษาวิจัยที่ถูกต้องและเข้าใจง่าย",
+    input:"ข้อมูลที่เก็บได้: [ระบุ/paste ข้อมูล] เครื่องมือที่ใช้: [แบบสอบถาม/แบบทดสอบ Pre-Post] จำนวนกลุ่มตัวอย่าง: [จำนวน] สถิติที่กำหนด: [ค่าเฉลี่ย/SD/t-test/อื่นๆ]",
+    steps:"1. จัดระเบียบข้อมูลและสร้างตาราง\n2. คำนวณสถิติที่กำหนด\n3. อ่านผลและแปลความหมาย\n4. เขียนอธิบายผลเป็นภาษาวิจัย\n5. สร้างตาราง/กราฟนำเสนอผล\n6. สรุปผลการวิจัยตามวัตถุประสงค์",
+    expect:"บทที่ 4 งานวิจัยสมบูรณ์ มีตาราง/กราฟนำเสนอผลทุกวัตถุประสงค์ คำอธิบายผลเป็นภาษาวิจัยที่ถูกต้อง และสรุปผลที่ชัดเจน"
+  },
+  {
+    id:31, cat:"2",
+    title:"เขียนสรุป อภิปราย และข้อเสนอแนะวิจัย (บทที่ 5)",
+    desc:"เขียนบทสรุปวิจัยที่เชื่อมโยงผลกับทฤษฎีและมีข้อเสนอแนะที่มีคุณค่า",
+    role:"คุณคือนักวิชาการการศึกษาอาวุโสที่มีประสบการณ์เขียนและตรวจ Discussion Section ของงานวิจัยการศึกษา เข้าใจการเชื่อมโยงผลวิจัยกับทฤษฎีและงานวิจัยที่เกี่ยวข้อง",
+    input:"ผลการวิจัยหลัก: [ระบุสรุปผล] วัตถุประสงค์วิจัย: [ระบุ] ทฤษฎี/งานวิจัยที่อ้างอิง: [ระบุจากบทที่ 2] ข้อจำกัดที่พบ: [ระบุ]",
+    steps:"1. สรุปผลการวิจัยตามวัตถุประสงค์\n2. อภิปรายผลโดยเชื่อมโยงทฤษฎีและงานวิจัยที่เกี่ยวข้อง\n3. ระบุข้อค้นพบที่น่าสนใจ\n4. ระบุข้อจำกัดของการวิจัย\n5. เขียนข้อเสนอแนะ (นำผล/วิจัยต่อ)",
+    expect:"บทที่ 5 งานวิจัยสมบูรณ์ครบ 4 ส่วน สรุปผลชัดเจน การอภิปรายเชื่อมโยงทฤษฎีอย่างมีคุณภาพ ข้อจำกัด และข้อเสนอแนะที่เฉพาะเจาะจงและปฏิบัติได้"
+  },
+  {
+    id:32, cat:"2",
+    title:"ออกแบบนวัตกรรมการสอนเพื่อแก้ปัญหาในวิจัยชั้นเรียน",
+    desc:"สร้างสรรค์นวัตกรรมการสอนวิชาเทคโนโลยีที่ตอบโจทย์ปัญหาที่วิจัย",
+    role:"คุณคือนักวิจัยนวัตกรรมการศึกษาที่มีประสบการณ์สร้างสื่อ/กิจกรรม/กลยุทธ์การสอนใหม่ๆ ที่ได้รับการยืนยันประสิทธิผลในบริบทโรงเรียนไทย",
+    input:"ปัญหาที่วิจัย: [ระบุ] ลักษณะผู้เรียน: [ระดับชั้น/ลักษณะ] ข้อจำกัดด้านทรัพยากร: [งบ/อุปกรณ์/เวลา] ทฤษฎีที่อยากใช้: [ระบุหากมี]",
+    steps:"1. วิเคราะห์ Root Cause ของปัญหา\n2. ระดมนวัตกรรมที่เป็นไปได้ 3-5 แนวทาง\n3. ประเมิน Feasibility แต่ละแนวทาง\n4. ออกแบบนวัตกรรมที่เลือกอย่างละเอียด\n5. วางแผนทดลองใช้และประเมิน",
+    expect:"คำอธิบายนวัตกรรม 1-2 ทางเลือก พร้อม Blueprint การออกแบบ แผนทดลองใช้ วิธีประเมินประสิทธิผล และ Prototype/ตัวอย่างแรก"
+  },
+  {
+    id:33, cat:"2",
+    title:"จัดทำบทคัดย่อ (Abstract) งานวิจัยในชั้นเรียน",
+    desc:"เขียนบทคัดย่อวิจัยในชั้นเรียนวิชาเทคโนโลยีที่กระชับและครบถ้วน",
+    role:"คุณคือบรรณาธิการวารสารวิจัยการศึกษาที่เชี่ยวชาญการเขียนบทคัดย่อตามมาตรฐาน APA 7th ที่กระชับ ชัดเจน และดึงดูดความสนใจ",
+    input:"หัวข้อวิจัย: [ระบุ] วัตถุประสงค์หลัก: [ระบุ] กลุ่มตัวอย่าง: [ระบุ] วิธีการ: [ระบุ] ผลการวิจัยหลัก: [ระบุ] ข้อสรุป: [ระบุ]",
+    steps:"1. เขียนประโยคเปิด: ความสำคัญของปัญหา\n2. ระบุวัตถุประสงค์\n3. อธิบายกลุ่มตัวอย่างและวิธีการ\n4. สรุปผลหลัก\n5. ระบุข้อสรุปและข้อเสนอแนะ\n6. ตรวจสอบความยาว (ไม่เกิน 300 คำ) และ APA Format",
+    expect:"บทคัดย่อภาษาไทยและภาษาอังกฤษ (Abstract) ความยาวไม่เกิน 300 คำ ครบทุกองค์ประกอบ ตามมาตรฐาน APA 7th และ Keywords 5 คำ"
+  },
+  {
+    id:34, cat:"2",
+    title:"สร้างเครื่องมือวัดผลสัมฤทธิ์ทางการเรียน (Pre-Post Test) วิจัย",
+    desc:"ออกแบบแบบทดสอบวัดความรู้ก่อน-หลังที่มีคุณภาพสำหรับวิจัยในชั้นเรียน",
+    role:"คุณคือผู้เชี่ยวชาญการสร้างแบบทดสอบวัดผลสัมฤทธิ์ที่มีความรู้ด้าน Test Blueprint, Item Analysis และ Test Validity/Reliability ตามมาตรฐานการศึกษา",
+    input:"หัวข้อ/เนื้อหาที่วัด: [ระบุ] ระดับการคิด Bloom's ที่วัด: [ระบุ] จำนวนข้อ: [ระบุ] รูปแบบข้อ: [ปรนัย/อัตนัย/ผสม] นวัตกรรมที่ทดลอง: [ระบุ]",
+    steps:"1. สร้าง Test Blueprint ครอบคลุมเนื้อหาและระดับ Bloom's\n2. เขียนข้อสอบตาม Blueprint\n3. กำหนด Scoring Rubric สำหรับข้ออัตนัย\n4. ออกแบบ Item Analysis Plan\n5. วางแผนหา IOC (Index of Congruence)\n6. จัดทำ Answer Key และ Scoring Guide",
+    expect:"ชุดแบบทดสอบ Pre-Post Test พร้อม Test Blueprint, Answer Key, Scoring Rubric, วิธีหา IOC และ Plan วิเคราะห์คุณภาพข้อสอบ"
+  },
+  {
+    id:35, cat:"2",
+    title:"วางแผนเก็บข้อมูลวิจัยในชั้นเรียนอย่างเป็นระบบ",
+    desc:"วางแผนขั้นตอนและตารางการเก็บข้อมูลวิจัยที่ชัดเจนและปฏิบัติได้จริง",
+    role:"คุณคือที่ปรึกษาวิจัยการศึกษาที่ช่วยครูวางแผนการเก็บข้อมูลอย่างเป็นระบบ โดยคำนึงถึงข้อจำกัดด้านเวลาและภาระงานสอนของครู สพฐ.",
+    input:"เครื่องมือวิจัย: [รายการเครื่องมือที่ใช้] ระยะเวลาเก็บข้อมูล: [จำนวนสัปดาห์] ตาราง/ชั่วโมงสอน: [ระบุ] นวัตกรรมที่ทดลอง: [ระยะเวลา] ผู้ช่วยวิจัย: [มี/ไม่มี]",
+    steps:"1. วิเคราะห์ช่วงเวลาที่เหมาะสมสำหรับการเก็บข้อมูลแต่ละชนิด\n2. สร้างตาราง Data Collection Timeline\n3. ออกแบบ Data Recording Forms\n4. วางแผน Data Management & Storage\n5. กำหนด Backup Plan กรณีข้อมูลขาดหาย",
+    expect:"ตาราง Data Collection Plan ทีละสัปดาห์, Data Recording Forms สำหรับทุกเครื่องมือ, Data Management Checklist และ Backup Plan"
+  },
+  {
+    id:36, cat:"2",
+    title:"วิเคราะห์ข้อมูลวิจัยเชิงคุณภาพ (Qualitative Analysis)",
+    desc:"ช่วยวิเคราะห์ข้อมูลเชิงคุณภาพจากการสังเกตและสัมภาษณ์วิจัยชั้นเรียน",
+    role:"คุณคือผู้เชี่ยวชาญการวิจัยเชิงคุณภาพทางการศึกษาที่เชี่ยวชาญ Content Analysis, Thematic Analysis และการเขียนรายงานเชิงคุณภาพที่น่าเชื่อถือ",
+    input:"ข้อมูลเชิงคุณภาพที่มี: [บันทึกการสังเกต/Transcript สัมภาษณ์/งานนักเรียน] วัตถุประสงค์วิจัย: [ระบุ] ขอบเขตที่ต้องการวิเคราะห์: [ระบุ]",
+    steps:"1. จัดระเบียบข้อมูลและ Transcription\n2. Open Coding: กำหนด Codes เบื้องต้น\n3. Axial Coding: จัดกลุ่ม Codes เป็น Categories\n4. Selective Coding: ระบุ Core Themes\n5. เขียน Thick Description\n6. ตรวจสอบ Member Checking และ Triangulation",
+    expect:"ผลการวิเคราะห์เชิงคุณภาพ มี Coding Tree, ตาราง Themes และ Evidence, Thick Description แต่ละ Theme และตาราง Triangulation"
+  },
+  {
+    id:37, cat:"2",
+    title:"เขียนรายงานวิจัยในชั้นเรียนฉบับสมบูรณ์",
+    desc:"รวบรวมและตรวจสอบรายงานวิจัยในชั้นเรียนให้ครบถ้วนตามรูปแบบ สพฐ.",
+    role:"คุณคือบรรณาธิการงานวิจัยการศึกษาที่มีประสบการณ์ตรวจและแก้รายงานวิจัยในชั้นเรียนให้ผ่านมาตรฐาน สพฐ. และวิทยฐานะ คศ.3/คศ.4",
+    input:"ชื่อวิจัย: [ระบุ] สถานะปัจจุบัน: [ส่วนที่เขียนแล้ว/ยังไม่ได้เขียน] จุดที่ต้องการช่วย: [ระบุ] มาตรฐานที่ต้องผ่าน: [วิทยฐานะ/กศน./อื่นๆ]",
+    steps:"1. ตรวจสอบความครบถ้วนของรูปแบบรายงาน\n2. ตรวจสอบความสอดคล้องระหว่างบท\n3. ปรับปรุงภาษาและรูปแบบการอ้างอิง APA 7th\n4. ตรวจสอบตาราง กราฟ และภาพประกอบ\n5. จัดทำ Checklist ความสมบูรณ์",
+    expect:"รายงานวิจัยในชั้นเรียนฉบับสมบูรณ์ที่ผ่านการตรวจ Checklist ครบทุกส่วน พร้อมรูปแบบ APA ที่ถูกต้องและบรรณานุกรม"
+  },
+  {
+    id:38, cat:"2",
+    title:"สร้าง Poster นำเสนองานวิจัยในชั้นเรียน",
+    desc:"ออกแบบ Research Poster ที่น่าสนใจสำหรับการนำเสนองานวิจัยในงานประชุมวิชาการ",
+    role:"คุณคือผู้เชี่ยวชาญการออกแบบ Academic Poster ที่ช่วยครูนำเสนองานวิจัยในชั้นเรียนให้มีความน่าสนใจ กระชับ และสื่อสารได้อย่างมีประสิทธิภาพในงานประชุมวิชาการ",
+    input:"ชื่อวิจัย: [ระบุ] ผลการวิจัยหลัก: [ระบุ] กราฟ/ตาราง: [ระบุที่ต้องการแสดง] กลุ่มผู้ฟัง: [ครู/ผู้บริหาร/นักวิชาการ] งาน: [ประชุม/สัมมนา]",
+    steps:"1. กำหนด Key Messages 3-5 จุดหลัก\n2. ออกแบบ Layout Poster A0 ที่อ่านง่าย\n3. เขียน Content ย่อแต่ครบถ้วน\n4. กำหนด Visual Elements (กราฟ/ตาราง/ภาพ)\n5. เขียน Elevator Pitch 2 นาที\n6. เตรียม Q&A สำหรับคำถามที่คาดว่าจะถาม",
+    expect:"โครงสร้าง Poster Layout พร้อม Content Script แต่ละ Section, Elevator Pitch 2 นาที และ Q&A Guide สำหรับคำถามที่พบบ่อย"
+  },
+  {
+    id:39, cat:"2",
+    title:"ทำ Action Research Cycle สำหรับปัญหาวิชาเทคโนโลยี",
+    desc:"ดำเนินวงจรวิจัยเชิงปฏิบัติการ Plan-Act-Observe-Reflect สำหรับห้องเรียนเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Action Research ที่มีประสบการณ์ช่วยครูดำเนินวงจร AR และสร้างการปรับปรุงการสอนอย่างต่อเนื่องในบริบทโรงเรียนมัธยมไทย",
+    input:"ปัญหาหลัก: [ระบุ] Cycle ที่: [1/2/3] ผลจาก Cycle ก่อน: [ระบุหากมี] ทรัพยากร: [ระบุ] ระยะเวลา: [ชั่วโมง/สัปดาห์]",
+    steps:"1. Plan: วิเคราะห์ปัญหาและวางแผน Intervention\n2. Action: ออกแบบกิจกรรม/นวัตกรรมที่จะใช้\n3. Observation: วางแผนเครื่องมือสังเกตและบันทึก\n4. Reflection: ตั้งคำถาม Reflection ที่จะใช้\n5. วางแผน Cycle ต่อไปจากบทเรียนที่ได้",
+    expect:"แผน Action Research Cycle ที่กำหนด มี Plan-Act-Observe-Reflect ครบถ้วน, Observation Tools, Reflection Questions และแผน Next Cycle"
+  },
+  {
+    id:40, cat:"2",
+    title:"ทบทวนและปรับปรุงงานวิจัยในชั้นเรียนให้ผ่านเกณฑ์วิทยฐานะ",
+    desc:"ตรวจสอบและปรับปรุงงานวิจัยให้ตรงตามเกณฑ์การประเมินวิทยฐานะ สพฐ.",
+    role:"คุณคือผู้ประเมินงานวิจัยในชั้นเรียนระดับ สพฐ. ที่มีประสบการณ์ตรวจงานวิจัยหลายร้อยเรื่อง เข้าใจเกณฑ์การประเมิน คศ.3/คศ.4 อย่างละเอียด",
+    input:"งานวิจัยที่มี: [วาง/paste ส่วนที่ต้องการตรวจ] ระดับวิทยฐานะที่สมัคร: [คศ.2/คศ.3/คศ.4] ปีที่สมัคร: [ระบุ] จุดที่กังวล: [ระบุ]",
+    steps:"1. ตรวจสอบตามเกณฑ์วิทยฐานะที่ระบุ\n2. ระบุจุดที่ผ่านและจุดที่ต้องปรับปรุง\n3. ให้คำแนะนำเฉพาะจุดสำหรับการปรับปรุง\n4. ตรวจสอบภาษาและรูปแบบ\n5. จัดลำดับความสำคัญในการแก้ไข",
+    expect:"รายงานการตรวจ Checklist ตามเกณฑ์วิทยฐานะ, รายการจุดที่ต้องแก้ไขเรียงลำดับความสำคัญ, คำแนะนำเฉพาะเจาะจงสำหรับการปรับปรุงทุกจุด"
+  },
+  {
+    id:41, cat:"2",
+    title:"วางแผนวิจัยเชิงทดลอง (Quasi-Experimental) วิชาเทคโนโลยี",
+    desc:"ออกแบบการวิจัยเชิงทดลองกึ่งที่มีกลุ่มควบคุมสำหรับทดสอบนวัตกรรมการสอน",
+    role:"คุณคือนักวิจัยการศึกษาที่เชี่ยวชาญการออกแบบงานวิจัยเชิงทดลองกึ่ง (Quasi-Experimental Design) ที่เหมาะกับบริบทห้องเรียนจริงที่ไม่สามารถ Randomize ได้",
+    input:"นวัตกรรมที่ทดสอบ: [ระบุ] ตัวแปรต้น: [ระบุ] ตัวแปรตาม: [ระบุ] ห้องเรียนที่มี: [ทดลอง/ควบคุม จำนวน] ระยะเวลา: [ภาคเรียน]",
+    steps:"1. กำหนด Research Design (One-Group Pre-Post/Two-Group)\n2. กำหนดตัวแปรและนิยามปฏิบัติการ\n3. วางแผน Pre-test เพื่อตรวจสอบความเทียบเคียง\n4. ออกแบบ Treatment Protocol สำหรับกลุ่มทดลอง\n5. กำหนดสถิติทดสอบสมมุติฐาน\n6. วางแผน Threat to Internal Validity",
+    expect:"Research Design Blueprint ครบถ้วน มีแผนภาพ Design, นิยามตัวแปร, Treatment Protocol, Statistical Analysis Plan และตาราง Threats to Validity"
+  },
+  {
+    id:42, cat:"2",
+    title:"สร้างนวัตกรรมการสอนเพื่อส่งเสริมทักษะการคิดสร้างสรรค์เทคโนโลยี",
+    desc:"พัฒนานวัตกรรมที่กระตุ้น Creative Thinking ในวิชาเทคโนโลยี ม.ปลาย",
+    role:"คุณคือนักนวัตกรรมการศึกษาที่เชี่ยวชาญการออกแบบกิจกรรมส่งเสริมความคิดสร้างสรรค์ผ่านเทคโนโลยี โดยใช้แนวทาง Design Thinking และ Maker Education",
+    input:"หัวข้อ/เนื้อหา: [ระบุ] ระดับชั้น: [ม.ปลาย] ทรัพยากร: [อุปกรณ์/เครื่องมือ] เวลา: [ชั่วโมง] ทักษะสร้างสรรค์เป้าหมาย: [Fluency/Flexibility/Originality/Elaboration]",
+    steps:"1. ออกแบบ Design Challenge ที่กระตุ้น Divergent Thinking\n2. สร้าง Scaffold สำหรับกระบวนการสร้างสรรค์\n3. วางแผนกิจกรรม Prototype และ Iteration\n4. ออกแบบ Peer Critique กระบวนการ\n5. สร้าง Portfolio Assessment ทักษะสร้างสรรค์",
+    expect:"แผนนวัตกรรมส่งเสริม Creative Thinking พร้อม Design Challenge Brief, Scaffold Materials, Prototype Rubric และ Portfolio Assessment Framework"
+  },
+  {
+    id:43, cat:"2",
+    title:"วิจัยความพึงพอใจต่อการสอนวิชาเทคโนโลยีด้วย Active Learning",
+    desc:"ออกแบบวิจัยวัดความพึงพอใจนักเรียนต่อรูปแบบ Active Learning วิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญการวิจัยประเมินผลและความพึงพอใจทางการศึกษา มีประสบการณ์ออกแบบเครื่องมือวัดความพึงพอใจและการวิเคราะห์ทางสถิติ",
+    input:"รูปแบบ Active Learning ที่ทดลอง: [Project-Based/Flipped Classroom/Gamification/อื่นๆ] กลุ่มตัวอย่าง: [ระดับชั้น/จำนวน] ด้านที่วัด: [กิจกรรม/สื่อ/ครู/บรรยากาศ]",
+    steps:"1. กำหนด Dimension ความพึงพอใจ 4-5 ด้าน\n2. สร้างแบบสอบถาม Likert 5 ระดับ\n3. ออกแบบ Open-ended Questions เพิ่มเติม\n4. กำหนดสถิติวิเคราะห์ (ค่าเฉลี่ย/SD/ระดับความพึงพอใจ)\n5. ออกแบบการรายงานผลที่ครู สพฐ. ใช้ได้",
+    expect:"แบบสอบถามความพึงพอใจ 20-25 ข้อ, Scoring Guide, ตารางวิเคราะห์ข้อมูล, เกณฑ์แปลความหมายระดับความพึงพอใจ และ Template รายงานผล"
+  },
+  {
+    id:44, cat:"2",
+    title:"จัดทำ Best Practice Paper จากการวิจัยในชั้นเรียน",
+    desc:"สร้างบทความ Best Practice เพื่อเผยแพร่นวัตกรรมการสอนวิชาเทคโนโลยีที่ประสบความสำเร็จ",
+    role:"คุณคือบรรณาธิการวารสารวิจัยการศึกษาที่มีประสบการณ์เขียนและแก้บทความวิชาการสำหรับการประชุมวิชาการ สพฐ. และวารสารระดับชาติ",
+    input:"งานวิจัยที่มีอยู่: [สรุปผลการวิจัย] นวัตกรรมที่ประสบความสำเร็จ: [ระบุ] ผลลัพธ์ที่โดดเด่น: [ระบุ] กลุ่มเป้าหมายบทความ: [ครู/ผู้บริหาร/นักวิชาการ]",
+    steps:"1. เขียน Abstract น่าสนใจ\n2. เขียน Introduction เชื่อมโยงปัญหาสู่ Solution\n3. อธิบายนวัตกรรมอย่างละเอียด (เพียงพอให้ผู้อื่น Replicate)\n4. นำเสนอผลลัพธ์ด้วยข้อมูลเชิงประจักษ์\n5. สรุปบทเรียนและข้อเสนอแนะ\n6. Format ตาม APA 7th",
+    expect:"บทความ Best Practice ฉบับสมบูรณ์ความยาว 8-12 หน้า A4 ตาม Format วารสารไทย พร้อม Abstract ภาษาไทย-อังกฤษ และ References APA 7th"
+  },
+
+  // ═══════════════════════════════════════════
+  // หมวด 3: การสร้างสื่อการสอนวิชาเทคโนโลยี (23 prompts)
+  // ═══════════════════════════════════════════
+  {
+    id:45, cat:"3",
+    title:"ออกแบบ Infographic สอนแนวคิดเทคโนโลยีให้เข้าใจง่าย",
+    desc:"สร้าง Infographic Content สำหรับสอนหัวข้อเทคโนโลยีที่ซับซ้อนให้ชัดเจน",
+    role:"คุณคือนักออกแบบสื่อการเรียนการสอนและ Visual Communication Expert ที่เชี่ยวชาญการออกแบบ Infographic ทางการศึกษาที่สวยงามและสื่อสารได้อย่างมีประสิทธิภาพ",
+    input:"หัวข้อ: [แนวคิดเทคโนโลยีที่ต้องการอธิบาย] ระดับผู้เรียน: [ม.ปลาย] ข้อมูลหลัก: [bullet points หรือ draft content] เครื่องมือสร้าง: [Canva/Piktochart/PowerPoint/Adobe Express]",
+    steps:"1. กำหนด Key Message 3-5 จุดหลักที่ต้องการสื่อ\n2. วางโครงสร้าง Visual Flow ที่สอดคล้องกับ Reading Pattern\n3. กำหนด Visual Metaphor สำหรับแต่ละ Concept\n4. เขียน Text Content ที่กระชับและแม่นยำ\n5. กำหนด Color Scheme และ Typography\n6. สร้าง Layout Mockup แบบ Wireframe",
+    expect:"Script/Brief สำหรับสร้าง Infographic ประกอบด้วย Key Messages, Visual Flow, Text Content แต่ละ Section, Color Palette และ Canva/Piktochart Layout Instructions"
+  },
+  {
+    id:46, cat:"3",
+    title:"เขียนบทวิดีโอสอน (Script) วิชาเทคโนโลยี",
+    desc:"สร้าง Script วิดีโอการสอนที่น่าสนใจและเข้าใจง่ายสำหรับ ม.ปลาย",
+    role:"คุณคือผู้เชี่ยวชาญการสร้างเนื้อหาวิดีโอการเรียนการสอนที่มีประสบการณ์เขียน Script สำหรับช่อง YouTube ครู และ E-learning Platform ของโรงเรียน",
+    input:"หัวข้อ: [เนื้อหาที่ต้องการสอน] ระดับ: [ม.ปลาย] ความยาว: [3-5 นาที / 5-10 นาที] รูปแบบ: [Explainer/Demo/Tutorial/Lecture] โทน: [เป็นทางการ/สนุกสนาน]",
+    steps:"1. เขียน Hook 15-30 วินาทีแรกที่ดึงดูดความสนใจ\n2. ระบุ Learning Outcome ที่ชัดเจน\n3. เขียนเนื้อหาหลักเป็น Segments ละ 1-2 นาที\n4. ออกแบบ Visual/Screen Direction แต่ละ Scene\n5. เขียน Summary และ Call-to-Action\n6. เพิ่ม Transition Phrases เชื่อม Segment",
+    expect:"Video Script ฉบับสมบูรณ์ในรูปแบบ 2 คอลัมน์ (บทพูด/Visual Direction) พร้อม Hook, Key Points, Summary และ Timing Cue"
+  },
+  {
+    id:47, cat:"3",
+    title:"สร้าง Presentation Slides (PowerPoint/Google Slides) วิชาเทคโนโลยี",
+    desc:"ออกแบบ Slide Deck ที่สวยงาม น่าสนใจ และสนับสนุนการเรียนรู้",
+    role:"คุณคือนักออกแบบ Presentation ที่เชี่ยวชาญหลักการ Visual Learning และ Slide Design สำหรับการศึกษา ผ่านการอบรม Presentation Zen และ Slide:ology",
+    input:"หัวข้อ: [เนื้อหา] ระดับ: [ม.ปลาย] จำนวน Slide: [ประมาณ] เวลาสอน: [ชั่วโมง] โทน: [วิชาการ/สนุก/Modern] เนื้อหาหลัก: [bullet points draft]",
+    steps:"1. วางโครงสร้าง Slide: Title → Agenda → Content → Summary → Q&A\n2. ออกแบบ Slide Layout ที่สอดคล้องกับ Cognitive Load Theory\n3. กำหนด Slide ที่ควรมี Animation/Transition\n4. เขียน Speaker Notes แต่ละ Slide\n5. กำหนด Interactive Elements (Poll/Quiz/Discussion)\n6. สร้าง Template Design Brief",
+    expect:"Slide Outline ครบทุก Slide พร้อม Key Visual, Text Content, Speaker Notes และ Design Brief สำหรับนำไปสร้างใน PowerPoint/Google Slides"
+  },
+  {
+    id:48, cat:"3",
+    title:"สร้างสื่อ Interactive (Kahoot/Quizizz/Padlet) วิชาเทคโนโลยี",
+    desc:"ออกแบบกิจกรรม Interactive Digital สำหรับเพิ่ม Engagement ในชั้นเรียน",
+    role:"คุณคือผู้เชี่ยวชาญ EdTech Tools ที่มีประสบการณ์ออกแบบกิจกรรมดิจิทัล Interactive สำหรับห้องเรียนไทย เข้าใจเครื่องมือ Kahoot, Quizizz, Padlet, Mentimeter, Nearpod",
+    input:"เครื่องมือ: [Kahoot/Quizizz/Padlet/Mentimeter/Nearpod] เนื้อหา: [หัวข้อ] วัตถุประสงค์: [ทบทวน/สำรวจความรู้/Brainstorm/Voting] จำนวนข้อ/ไอเทม: [ระบุ] เวลา: [นาที]",
+    steps:"1. กำหนด Activity Type และ Format ที่เหมาะสม\n2. สร้างคำถาม/Prompt ที่กระตุ้น Higher Order Thinking\n3. ออกแบบ Correct/Incorrect Feedback\n4. วางแผนการใช้งานในชั้นเรียน\n5. เตรียม Debrief Questions หลังกิจกรรม",
+    expect:"ชุดคำถาม/Prompt สำหรับ [เครื่องมือที่เลือก] จำนวนที่ระบุ พร้อม Answer Keys, Explanations, คำแนะนำการตั้งค่า และ Debrief Guide"
+  },
+  {
+    id:49, cat:"3",
+    title:"พัฒนา E-Learning Content สำหรับวิชาเทคโนโลยี",
+    desc:"สร้างเนื้อหา E-Learning ที่มีคุณภาพสำหรับการเรียนรู้ด้วยตนเอง",
+    role:"คุณคือ Instructional Designer ที่มีประสบการณ์สร้างสรรค์ E-Learning ตาม ADDIE Model และ Mager's Learning Objectives เชี่ยวชาญ Platform เช่น Google Classroom, Moodle, Edmodo",
+    input:"หน่วยการเรียนรู้: [ระบุ] Platform: [Google Classroom/Moodle/โรงเรียนเอง] รูปแบบ: [Video+Quiz/Reading+Activity/Mixed] ระยะเวลา Self-study: [ชั่วโมง] ระดับ: [ม.ปลาย]",
+    steps:"1. ออกแบบ Learning Flow: Introduce→Learn→Practice→Assess\n2. สร้าง Content Chunk ขนาด 5-10 นาที\n3. ออกแบบ Formative Checks ทุก Chunk\n4. สร้าง Discussion Prompts\n5. กำหนด Summative Assessment\n6. วางแผน Student Feedback Loop",
+    expect:"E-Learning Module Blueprint ครบถ้วน ประกอบด้วย Learning Flow, Content Outline ทุก Chunk, Activity Instructions, Quiz Questions และ Discussion Prompts"
+  },
+  {
+    id:50, cat:"3",
+    title:"สร้างสื่อสอน Simulation/Virtual Lab วิชาเทคโนโลยี",
+    desc:"ออกแบบ Virtual Lab หรือ Simulation ทดแทน/เสริมการทดลองจริง",
+    role:"คุณคือผู้เชี่ยวชาญ Virtual Reality/Simulation ในการศึกษา ที่เชี่ยวชาญเครื่องมือ PhET Simulation, Tinkercad, Minecraft Education, Scratch",
+    input:"การทดลอง/กิจกรรมที่ต้องการ Simulate: [ระบุ] เหตุผลที่ใช้ Virtual: [ราคาแพง/อันตราย/ไม่มีอุปกรณ์] เครื่องมือ: [PhET/Tinkercad/Scratch/GeoGebra] ระดับ: [ม.ปลาย]",
+    steps:"1. วิเคราะห์ Learning Objectives ที่ Virtual Lab ต้องบรรลุ\n2. เลือก/ออกแบบ Simulation ที่เหมาะสมที่สุด\n3. สร้าง Lab Instruction Guide ทีละขั้นตอน\n4. ออกแบบ Data Recording Sheet\n5. สร้างคำถาม Pre-Lab, During-Lab, Post-Lab\n6. เชื่อมโยงกลับสู่ Concept ในบทเรียน",
+    expect:"Virtual Lab Package ประกอบด้วย Lab Instruction Guide, Data Recording Sheet, คำถาม 3 ระยะ, Debrief Discussion Guide และ Extension Activities"
+  },
+  {
+    id:51, cat:"3",
+    title:"สร้าง Gamification และ Game-Based Learning วิชาเทคโนโลยี",
+    desc:"ออกแบบระบบ Gamification หรือเกมเพื่อการเรียนรู้วิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Game-Based Learning ที่เชี่ยวชาญการนำ Game Elements (Points/Badges/Leaderboards/Missions) มาใช้ส่งเสริมการเรียนรู้วิชาเทคโนโลยีอย่างมีประสิทธิผล",
+    input:"เนื้อหา/ทักษะที่ต้องการสอน: [ระบุ] รูปแบบ: [Gamification ในชั้นเรียน/Digital Game/Board Game] เครื่องมือ: [Classcraft/Minecraft Edu/Scratch/Physical] เวลา: [ชั่วโมง]",
+    steps:"1. กำหนด Game Narrative/Theme ที่เชื่อมกับเนื้อหา\n2. ออกแบบ Game Mechanics (Rules, Points, Levels)\n3. สร้าง Challenges/Quests ที่สอดคล้อง Learning Objectives\n4. ออกแบบ Reward System และ Feedback Loop\n5. วางแผนการ Debrief หลังเกม\n6. กำหนดวิธีประเมิน Learning Outcomes",
+    expect:"Game Design Document ประกอบด้วย Narrative, Rules & Mechanics, Challenge Set, Reward System, Debrief Guide และ Assessment Plan"
+  },
+  {
+    id:52, cat:"3",
+    title:"สร้างสื่อ Augmented Reality (AR) สำหรับวิชาเทคโนโลยี",
+    desc:"ออกแบบสื่อ AR เพื่อทำให้แนวคิดเทคโนโลยีที่ซับซ้อนเข้าใจง่ายขึ้น",
+    role:"คุณคือผู้เชี่ยวชาญ Immersive Technology ในการศึกษาที่มีประสบการณ์สร้างสื่อ AR/VR สำหรับห้องเรียน ใช้เครื่องมือ Assemblr/CoSpaces Edu/HP Reveal",
+    input:"แนวคิด/เนื้อหา: [ที่ต้องการแสดง 3D หรือ Overlay] เครื่องมือ AR: [Assemblr/CoSpaces/Artivive] อุปกรณ์ผู้เรียน: [Tablet/Smartphone] ระดับ: [ม.ปลาย]",
+    steps:"1. กำหนด Learning Benefit จาก AR (vs สื่อ 2D ปกติ)\n2. ออกแบบ AR Trigger และ Overlay Content\n3. สร้าง Step-by-Step สำหรับ AR Development\n4. ออกแบบ Student Interaction กับ AR\n5. วางแผน Technical Testing\n6. สร้าง Student Guide การใช้งาน",
+    expect:"AR Development Brief ประกอบด้วย AR Concept Design, Trigger Design, Overlay Content Script, Student Interaction Guide และ Technical Checklist"
+  },
+  {
+    id:53, cat:"3",
+    title:"ออกแบบ Podcast/Audio Content สำหรับวิชาเทคโนโลยี",
+    desc:"สร้างสื่อเสียง Podcast ที่เป็นทางเลือกการเรียนรู้ในวิชาเทคโนโลยี",
+    role:"คุณคือ Audio Content Creator และ Podcast Producer ที่มีประสบการณ์สร้างสื่อเสียงทางการศึกษาที่น่าฟังและมีคุณค่าทางความรู้",
+    input:"หัวข้อ: [เนื้อหาเทคโนโลยี] รูปแบบ: [Solo/Interview/Panel/Storytelling] ความยาว: [นาที] กลุ่มเป้าหมาย: [นักเรียน ม.ปลาย] ช่องทาง: [Google Podcast/Spotify/เว็บโรงเรียน]",
+    steps:"1. เลือก Format ที่เหมาะกับเนื้อหา\n2. เขียน Podcast Script ด้วยภาษาพูดที่เป็นธรรมชาติ\n3. ออกแบบ Opening/Closing Signature\n4. กำหนด Sound Cues และ Music\n5. สร้าง Show Notes และ Transcript\n6. วางแผน Episode Series",
+    expect:"Podcast Episode Script ฉบับสมบูรณ์ในรูปแบบ Radio Script พร้อม Show Notes, Discussion Questions สำหรับฟังในชั้นเรียน และแผน Episode Series"
+  },
+  {
+    id:54, cat:"3",
+    title:"สร้าง Mind Map / Concept Map ดิจิทัล วิชาเทคโนโลยี",
+    desc:"ออกแบบ Mind Map/Concept Map ดิจิทัลสำหรับสอนความสัมพันธ์เชิงแนวคิด",
+    role:"คุณคือผู้เชี่ยวชาญ Visual Thinking และ Knowledge Mapping ที่ช่วยครูออกแบบ Concept Maps ที่สะท้อนโครงสร้างความรู้อย่างถูกต้องและนำมาใช้สอนได้อย่างมีประสิทธิภาพ",
+    input:"หัวข้อ/แนวคิดหลัก: [ระบุ] เนื้อหาที่ต้องการ Map: [ระบุ] เครื่องมือ: [Miro/Mural/Coggle/MindMeister/XMind] วัตถุประสงค์: [สอน/ทบทวน/ประเมิน/ทำงานกลุ่ม]",
+    steps:"1. กำหนด Central Concept และ Key Nodes\n2. วาง Hierarchy และ Cross-Links\n3. กำหนด Linking Phrases ที่แม่นยำ\n4. ออกแบบ Visual Coding (สี/รูปร่าง/ขนาด)\n5. สร้างเป็น Template ให้นักเรียนต่อยอด\n6. ออกแบบ Student Activity บน Map",
+    expect:"Concept Map Blueprint พร้อม Node Structure, Linking Phrases, Visual Coding Guide, Student Template Instructions และ 3 ตัวอย่าง Map สำหรับ Topic ย่อย"
+  },
+  {
+    id:55, cat:"3",
+    title:"สร้าง Microlearning Content วิชาเทคโนโลยีสำหรับ Smartphone",
+    desc:"ออกแบบเนื้อหา Microlearning สั้น 3-5 นาทีสำหรับเรียนผ่านมือถือ",
+    role:"คุณคือ Mobile Learning Designer ที่เชี่ยวชาญการออกแบบ Microlearning ที่เหมาะกับ Attention Span สั้นของนักเรียน Gen Z และ Mobile-First Learning Experience",
+    input:"หัวข้อ: [แนวคิดหรือทักษะ] ช่องทาง: [LINE/Instagram/TikTok/Reels/Shorts] เวลา: [60 วิ/3 นาที/5 นาที] รูปแบบ: [Video/Carousel/Story/Text+Image]",
+    steps:"1. ออกแบบ Single Learning Objective ต่อ Microlesson\n2. สร้าง Hook ใน 3 วินาทีแรก\n3. เขียน Content ในรูปแบบ Chunked สั้นๆ\n4. ออกแบบ Quick Check ท้าย Microlesson\n5. สร้าง CTA เชื่อมต่อ Microlesson ถัดไป\n6. วางแผน Microlearning Series",
+    expect:"Microlearning Package ประกอบด้วย Script/Storyboard แต่ละ Microlesson, Quick Check Questions, Visual Direction และแผน 5-10 Episode Series"
+  },
+  {
+    id:56, cat:"3",
+    title:"พัฒนา Digital Worksheet / Activity Sheet ออนไลน์",
+    desc:"สร้าง Worksheet ดิจิทัลแบบ Interactive สำหรับนักเรียน ม.ปลาย",
+    role:"คุณคือ Digital Learning Content Designer ที่เชี่ยวชาญการสร้าง Digital Worksheets ผ่าน Google Forms, Google Slides, Canva for Education หรือ Book Creator",
+    input:"หัวข้อ: [เนื้อหา] วัตถุประสงค์: [ฝึกทักษะ/ทบทวน/สำรวจ/สร้างสรรค์] Platform: [Google Forms/Slides/Canva/Wakelet] ระดับ: [ม.ปลาย] เวลาทำ: [นาที]",
+    steps:"1. กำหนด Activity Types ที่หลากหลาย\n2. ออกแบบ Instructions ที่ชัดเจนสำหรับ Self-paced\n3. สร้าง Question Set ที่สอดคล้อง Learning Objectives\n4. ออกแบบ Visual Layout บน Platform\n5. กำหนด Auto-feedback หรือ Teacher Feedback Points\n6. สร้าง Answer Guide สำหรับครู",
+    expect:"Digital Worksheet Content Package ประกอบด้วย Activity Instructions, Question Set, Visual Layout Brief, Teacher Answer Guide และ Tips สำหรับ Setup บน Platform"
+  },
+  {
+    id:57, cat:"3",
+    title:"สร้าง Video Tutorial สาธิตการใช้ Software/Tools เทคโนโลยี",
+    desc:"สร้างคู่มือ Video Tutorial สอนการใช้ซอฟต์แวร์หรือเครื่องมือดิจิทัล",
+    role:"คุณคือ Screen Recording และ Tutorial Creator ที่มีประสบการณ์สร้างวิดีโอสอนการใช้ซอฟต์แวร์ที่ชัดเจน เข้าใจง่าย เหมาะสำหรับนักเรียนที่ไม่มีพื้นฐาน",
+    input:"Software/Tool: [ชื่อซอฟต์แวร์/Platform] ทักษะที่สอน: [Feature/Workflow/Project] ระดับ: [Beginner/Intermediate] ความยาว: [นาที] OS: [Windows/Mac/Web]",
+    steps:"1. แบ่ง Tutorial เป็น Segments ตาม Workflow\n2. เขียน Screen Recording Script ทีละขั้นตอน\n3. กำหนด Zoom-in Callouts สำหรับจุดสำคัญ\n4. เขียน Voiceover Text ภาษาพูดธรรมชาติ\n5. ออกแบบ Practice Activity หลังดูวิดีโอ\n6. สร้าง Quick Reference Card",
+    expect:"Tutorial Script ทีละ Segment พร้อม Screen Action Cues, Voiceover Script, Practice Activity Instructions และ Quick Reference Card (Cheat Sheet)"
+  },
+  {
+    id:58, cat:"3",
+    title:"ออกแบบสื่อสอนสำหรับ Flipped Classroom วิชาเทคโนโลยี",
+    desc:"สร้างสื่อ Pre-class Learning สำหรับโมเดล Flipped Classroom",
+    role:"คุณคือผู้เชี่ยวชาญ Flipped Classroom Model ที่มีประสบการณ์ออกแบบ Pre-class Content และ In-class Activities ที่สมดุลกัน",
+    input:"หัวข้อ: [เนื้อหา] ชั้นเรียนที่มี: [เวลา/นักเรียน/อุปกรณ์] สื่อ Pre-class: [Video/Reading/Podcast] In-class Focus: [Problem-solving/Discussion/Project] Platform ออนไลน์: [ระบุ]",
+    steps:"1. แยก Direct Instruction ออกจาก In-class Activities\n2. ออกแบบ Pre-class Video/Reading ที่กระชับ\n3. สร้าง Accountability Mechanism (Quiz/Form ก่อนเข้าเรียน)\n4. ออกแบบ In-class Activities ที่ใช้ Higher Order Thinking\n5. วางแผน Differentiated Activities ใน In-class\n6. สร้าง Reflection Tool ปิดท้าย",
+    expect:"Flipped Classroom Package ประกอบด้วย Pre-class Content Script, Pre-class Check Quiz, In-class Activity Plan, Differentiation Options และ Reflection Tool"
+  },
+  {
+    id:59, cat:"3",
+    title:"สร้างสื่อ Storytelling สอนหัวข้อ Tech History/Evolution",
+    desc:"ออกแบบการเล่าเรื่องประวัติศาสตร์เทคโนโลยีอย่างน่าสนใจสำหรับ ม.ปลาย",
+    role:"คุณคือนักเล่าเรื่องและ Narrative Designer ทางการศึกษา ที่เชี่ยวชาญการเปลี่ยนข้อมูลทางประวัติศาสตร์เทคโนโลยีให้เป็นเรื่องเล่าที่น่าสนใจและสัมพันธ์กับชีวิตนักเรียน",
+    input:"หัวข้อ: [ประวัติ/วิวัฒนาการของเทคโนโลยีใด] ความยาว: [5/10/20 นาที] รูปแบบ: [วิดีโอ/การบรรยาย/Comic/Timeline] จุดเชื่อมกับชีวิตนักเรียน: [ระบุ]",
+    steps:"1. กำหนด Narrative Arc: Setting → Rising Action → Climax → Resolution\n2. เลือก Characters/Inventors ที่น่าสนใจ\n3. เชื่อมโยงกับปัญหา/ความต้องการของยุค\n4. สร้าง Cliffhangers และ Turning Points\n5. เชื่อม Tech History กับโลกปัจจุบัน\n6. ออกแบบ Discussion Questions",
+    expect:"Storytelling Script ฉบับสมบูรณ์พร้อม Narrative Arc, Character Profiles, Visual Timeline, Discussion Questions และ Extension: 'What Would You Have Done?' Activity"
+  },
+  {
+    id:60, cat:"3",
+    title:"สร้างสื่อ Case Study วิชาเทคโนโลยีจากบริบทจริง",
+    desc:"พัฒนา Case Study จากสถานการณ์จริงสำหรับสอนแนวคิดเทคโนโลยีอย่างเป็นรูปธรรม",
+    role:"คุณคือ Case Study Developer ทางการศึกษาที่มีประสบการณ์เขียน Case Studies สำหรับวิชาเทคโนโลยีที่กระตุ้นการวิเคราะห์และตัดสินใจของนักเรียน",
+    input:"แนวคิด/ทักษะที่ต้องการสอน: [ระบุ] บริบท Case: [บริษัทไทย/ปัญหาในชุมชน/Event โลก] ระดับความยาก: [ม.ปลาย] รูปแบบ: [Mini Case 1 หน้า/Full Case 3-5 หน้า]",
+    steps:"1. เลือกบริบทที่นักเรียน ม.ปลาย ไทยเชื่อมโยงได้\n2. เขียน Case Narrative ที่สมจริง\n3. ซ่อน Learning Points ในเรื่องเล่า\n4. สร้าง Discussion Questions 3 ระดับ\n5. ออกแบบ Role Play Scenarios\n6. สร้าง Teacher's Guide พร้อม Analysis Framework",
+    expect:"Case Study ฉบับสมบูรณ์ประกอบด้วย Narrative, Key Facts Box, Discussion Questions 3 ระดับ, Role Play Brief, Analysis Framework และ Teacher's Guide"
+  },
+  {
+    id:61, cat:"3",
+    title:"ออกแบบ Digital Storytelling Project สำหรับนักเรียน",
+    desc:"สร้าง Project Brief สำหรับให้นักเรียนสร้าง Digital Storytelling วิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Digital Storytelling ในการศึกษาที่มีประสบการณ์ออกแบบ Projects ที่นักเรียนได้แสดงออกทั้งด้าน Content Knowledge และ Digital Skills",
+    input:"เนื้อหา/แนวคิด: [ระบุ] รูปแบบ Digital Story: [Video/Podcast/Digital Book/Website/Comic] เครื่องมือ: [ระบุ] ระยะเวลา: [สัปดาห์] กลุ่ม: [คนเดียว/กลุ่ม 2-3 คน]",
+    steps:"1. กำหนด Story Requirements (เนื้อหา/ความยาว/Format)\n2. สร้าง Project Timeline พร้อม Checkpoints\n3. ออกแบบ Storyboard Template\n4. กำหนด Technical Skills ที่ต้องใช้\n5. สร้าง Peer Feedback Form\n6. ออกแบบ Showcase Event",
+    expect:"Project Brief ฉบับสมบูรณ์พร้อม Requirements, Timeline, Storyboard Template, Technical Tutorial List, Peer Feedback Form และ Showcase Guidelines"
+  },
+  {
+    id:62, cat:"3",
+    title:"สร้าง Learning Station Materials วิชาเทคโนโลยี",
+    desc:"ออกแบบสื่อและกิจกรรมสำหรับ Station Rotation ในชั้นเรียนเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Blended Learning และ Station Rotation Model ที่มีประสบการณ์ออกแบบ Learning Stations ที่นักเรียนทำงานได้อย่างอิสระและมีประสิทธิภาพ",
+    input:"หัวข้อ: [เนื้อหา] จำนวน Stations: [3-5] ประเภท Stations: [Computer/Hands-on/Reading/Discussion] เวลาต่อ Station: [นาที] ระดับ: [ม.ปลาย]",
+    steps:"1. กำหนดวัตถุประสงค์แต่ละ Station ไม่ซ้ำกัน\n2. สร้าง Station Instructions ที่นักเรียนทำได้อิสระ\n3. ออกแบบ Materials และ Tasks แต่ละ Station\n4. กำหนด Student Recording/Output แต่ละ Station\n5. วางแผน Transition Protocol\n6. สร้าง Station Debrief Activity",
+    expect:"Learning Station Package ครบทุก Station ประกอบด้วย Instruction Cards, Materials List, Student Recording Sheet, Transition Protocol และ Full-Group Debrief Plan"
+  },
+  {
+    id:63, cat:"3",
+    title:"สร้าง Portfolio-Based Learning Materials วิชาเทคโนโลยี",
+    desc:"ออกแบบระบบ Portfolio สำหรับนักเรียน ม.ปลาย ในวิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Portfolio Assessment และ Digital Portfolio ที่มีประสบการณ์ออกแบบ Portfolio Systems ที่สะท้อนการเติบโตของผู้เรียนได้อย่างแท้จริง",
+    input:"วิชา/หน่วยการเรียนรู้: [ระบุ] Platform: [Google Sites/Seesaw/Mahara/Google Drive Folder] ชิ้นงานที่ต้องการเก็บ: [ระบุ] ระยะเวลา: [ภาคเรียน/ปี] Audience: [ตัวเอง/ครู/ผู้ปกครอง]",
+    steps:"1. กำหนด Portfolio Purpose และ Audience\n2. ออกแบบ Portfolio Structure\n3. กำหนด Artifact Types และ Reflection Prompts\n4. สร้าง Portfolio Setup Guide สำหรับนักเรียน\n5. ออกแบบ Portfolio Review Process\n6. สร้าง Portfolio Assessment Rubric",
+    expect:"Portfolio System Package ประกอบด้วย Portfolio Structure Blueprint, Artifact List, Reflection Prompts 10+ ข้อ, Setup Guide, Review Protocol และ Assessment Rubric"
+  },
+  {
+    id:64, cat:"3",
+    title:"สร้างสื่อสอนโดยใช้ Coding Platform (Scratch/Python) ม.ปลาย",
+    desc:"พัฒนาสื่อการสอน Coding ที่เหมาะกับวัยและระดับ ม.ปลาย",
+    role:"คุณคือครูสอน Coding ที่มีประสบการณ์ใช้ Scratch, Python, Processing, p5.js ในการสอนมัธยมปลาย และออกแบบ Learning Materials ที่สอดคล้องกับระดับความสามารถ",
+    input:"Platform/ภาษา: [Scratch/Python/Processing/p5.js] ทักษะที่สอน: [ระบุ] ระดับ: [Beginner/Intermediate] ชิ้นงานสุดท้าย: [Game/Art/Animation/Tool] เวลา: [ชั่วโมง]",
+    steps:"1. ออกแบบ Starter Project ที่ดึงดูดความสนใจ\n2. สร้าง Worked Examples พร้อม Explanation\n3. ออกแบบ Guided Challenges (Scaffolded)\n4. สร้าง Open-Ended Extensions\n5. สร้าง Debug Challenge (หาข้อผิดพลาด)\n6. ออกแบบ Code Sharing & Remix Activity",
+    expect:"Coding Learning Materials Package ประกอบด้วย Starter Project Code, Worked Examples, Guided Challenge Set, Extension Projects, Debug Challenges และ Code Sharing Guidelines"
+  },
+  {
+    id:65, cat:"3",
+    title:"ออกแบบ Visual Timeline สำหรับสอนพัฒนาการเทคโนโลยีไทยและโลก",
+    desc:"สร้าง Interactive Timeline แสดงวิวัฒนาการเทคโนโลยีที่น่าสนใจและสร้างบริบท",
+    role:"คุณคือนักออกแบบสื่อ Data Visualization และ Timeline สำหรับการศึกษาที่เชี่ยวชาญการนำเสนอข้อมูลประวัติศาสตร์เทคโนโลยีในรูปแบบ Visual ที่น่าสนใจ",
+    input:"ช่วงเวลา: [ยุค/ปี] เนื้อหา: [พัฒนาการเทคโนโลยีด้านใด] เครื่องมือสร้าง: [Canva/Timeline JS/Sutori/Google Slides] บริบทไทย: [เชื่อมกับไทยไหม] จำนวน Events: [ประมาณ]",
+    steps:"1. Research Key Milestones และ Context\n2. เชื่อมโยง Global Events กับ Context ไทย\n3. ออกแบบ Visual Coding สำหรับ Timeline\n4. เขียน Event Description กระชับ 2-3 ประโยค\n5. กำหนด Interactive Elements\n6. สร้าง Student Activity ใช้ Timeline",
+    expect:"Timeline Content Package ประกอบด้วย Milestone Data Sheet, Design Brief, Event Descriptions ทุก Event, Interactive Activity Guide และ Student Research Extension"
+  },
+  {
+    id:66, cat:"3",
+    title:"สร้างสื่อสอน Robotics เบื้องต้นสำหรับ ม.ปลาย",
+    desc:"พัฒนาสื่อการสอน Robotics ที่เชื่อมทฤษฎีกับ Hands-on Practice",
+    role:"คุณคือครู Robotics ที่มีประสบการณ์สอน LEGO Mindstorms, VEX Robotics, mBot และ Arduino Robot ให้นักเรียนมัธยมได้ประสบความสำเร็จในการแข่งขัน",
+    input:"แพลตฟอร์ม Robot: [LEGO/mBot/Arduino/VEX] ทักษะที่สอน: [Assembly/Programming/Problem-solving] ระดับ: [ม.ปลาย] ชั่วโมง: [จำนวน] Challenge สุดท้าย: [ระบุ]",
+    steps:"1. ออกแบบ Build Challenge ระดับต่ำ → สูง\n2. สร้าง Programming Guide ทีละขั้นตอน\n3. ออกแบบ Debug Thinking Protocol\n4. สร้าง Engineering Design Challenge\n5. วางแผน Robot Showcase / Mini Competition\n6. เชื่อมโยงกับ Real-world Robotics Applications",
+    expect:"Robotics Learning Package ประกอบด้วย Build Challenges, Programming Guide, Debug Protocol, Engineering Challenge Brief, Competition Rules และ Real-world Connection Discussion"
+  },
+  {
+    id:67, cat:"3",
+    title:"พัฒนาสื่อสอน Data Visualization สำหรับ ม.ปลาย",
+    desc:"สร้างสื่อการสอนด้าน Data Visualization ให้นักเรียนสร้างและอ่านข้อมูลจากกราฟ",
+    role:"คุณคือผู้เชี่ยวชาญ Data Literacy และ Visualization ที่มีประสบการณ์สอนนักเรียนมัธยมให้อ่าน วิเคราะห์ และสร้างการแสดงผลข้อมูลที่มีความหมาย",
+    input:"ประเภท Chart/Visualization: [Bar/Line/Pie/Scatter/Heatmap/อื่นๆ] เครื่องมือ: [Google Sheets/Tableau Public/Flourish/Datawrapper] ข้อมูล: [Real Dataset ที่ต้องการใช้] ระดับ: [ม.ปลาย]",
+    steps:"1. เลือก Dataset จริงที่นักเรียน ม.ปลาย ไทยสนใจ\n2. สร้าง Data Exploration Protocol\n3. สอน Chart Selection Framework\n4. ออกแบบ Hands-on Visualization Lab\n5. สร้าง Critique Framework สำหรับ Visualization\n6. ออกแบบ Storytelling with Data Assignment",
+    expect:"Data Visualization Learning Package ประกอบด้วย Dataset+Cleaning Instructions, Chart Selection Guide, Lab Instructions, Visualization Critique Checklist และ Storytelling Assignment Brief"
+  },
+
+  // ═══════════════════════════════════════════
+  // หมวด 4: แบบทดสอบ / แบบประเมิน (23 prompts)
+  // ═══════════════════════════════════════════
+  {
+    id:68, cat:"4",
+    title:"สร้างข้อสอบปรนัย (MCQ) วิชาเทคโนโลยีคุณภาพสูง",
+    desc:"ออกแบบข้อสอบ MCQ ที่วัดความคิดระดับสูงและครอบคลุมเนื้อหา",
+    role:"คุณคือผู้เชี่ยวชาญการสร้างแบบทดสอบวัดผลสัมฤทธิ์ที่มีความรู้ด้าน Item Writing ตามแนวทาง Bloom's Taxonomy และ PISA Framework เชี่ยวชาญการเขียนข้อสอบที่มีคุณภาพสูง",
+    input:"หัวข้อ: [เนื้อหาที่ต้องการทดสอบ] ระดับ Bloom's: [Remember/Understand/Apply/Analyze] จำนวนข้อ: [จำนวน] จำนวนตัวเลือก: [4/5 ตัวเลือก] ระดับชั้น: [ม.ปลาย]",
+    steps:"1. สร้าง Test Blueprint ตามเนื้อหาและระดับ Bloom's\n2. เขียนคำสั่ง (Stem) ที่ชัดเจน ไม่กำกวม\n3. กำหนด Correct Answer และ Plausible Distractors\n4. หลีกเลี่ยง Item Flaws (Clues/Negative Stems)\n5. ตรวจสอบ Content Validity และ Fairness\n6. สร้าง Answer Key พร้อม Rationale",
+    expect:"ข้อสอบ MCQ จำนวนที่กำหนด ตาม Test Blueprint, Answer Key พร้อม Explanation สำหรับทุกข้อ, Item Flaw Checklist และ Scoring Guide"
+  },
+  {
+    id:69, cat:"4",
+    title:"ออกแบบข้อสอบอัตนัย (Essay) วิชาเทคโนโลยีระดับ Higher Order",
+    desc:"สร้างข้อสอบอัตนัยที่วัดการคิดวิเคราะห์สังเคราะห์วิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญการออกแบบ Essay Questions และ Performance Assessment ที่มีประสบการณ์เขียนข้อสอบระดับ Higher Order Thinking สำหรับวิชาเทคโนโลยีมัธยม",
+    input:"หัวข้อ: [เนื้อหา] ระดับ Bloom's: [Analyze/Evaluate/Create] ประเภทคำถาม: [Analytical/Evaluative/Creative/Problem-solving] คะแนน: [คะแนนต่อข้อ] เวลาทำ: [นาที]",
+    steps:"1. กำหนด Cognitive Demand ที่ต้องการวัด\n2. เขียนคำถามที่มี Authentic Context\n3. กำหนด Task Constraints ที่ชัดเจน\n4. สร้าง Model Answer (Exemplary Response)\n5. ออกแบบ Holistic/Analytic Rubric\n6. ตรวจสอบ Scorer Reliability",
+    expect:"ข้อสอบอัตนัยคุณภาพสูง 3-5 ข้อ พร้อม Model Answers, Analytic Rubric ทุกข้อ, Scoring Guide, Inter-rater Reliability Instructions และ Common Student Errors"
+  },
+  {
+    id:70, cat:"4",
+    title:"สร้างแบบประเมินชิ้นงาน (Performance Assessment) วิชาเทคโนโลยี",
+    desc:"ออกแบบ Rubric ประเมินชิ้นงาน Project และ Performance ในวิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Authentic Assessment และ Rubric Design ที่มีประสบการณ์สร้าง Rubrics คุณภาพสูงสำหรับประเมินชิ้นงานเทคโนโลยีในระดับมัธยม",
+    input:"ชิ้นงาน/Performance: [Project/Presentation/Code/Video/Design] เนื้อหา/ทักษะ: [ระบุ] ระดับชั้น: [ม.ปลาย] คะแนนรวม: [จำนวน] Dimensions ที่วัด: [ระบุหรือให้ AI แนะนำ]",
+    steps:"1. กำหนด Dimensions/Criteria ที่สำคัญ\n2. กำหนดจำนวนระดับคะแนน (3/4/5 ระดับ)\n3. เขียน Descriptors แต่ละ Cell ให้ชัดเจน\n4. ทดสอบ Rubric ด้วย Sample Work\n5. สร้าง Student-Friendly Version\n6. ออกแบบ Self-Assessment Version สำหรับนักเรียน",
+    expect:"Rubric ประเมินชิ้นงานแบบ Analytic ครบทุก Dimension, Student-Friendly Version, Self-Assessment Checklist และ Sample Work Calibration Guide"
+  },
+  {
+    id:71, cat:"4",
+    title:"ออกแบบแบบสังเกตพฤติกรรมการเรียนรู้วิชาเทคโนโลยี",
+    desc:"สร้างเครื่องมือสังเกตและบันทึกพฤติกรรมการเรียนรู้วิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Formative Assessment และ Observational Assessment ที่มีประสบการณ์ออกแบบเครื่องมือสังเกตพฤติกรรมการเรียนที่ใช้งานได้จริงในห้องเรียน",
+    input:"พฤติกรรมที่ต้องการสังเกต: [Collaboration/Problem-solving/CT/Creativity/Communication] บริบท: [กิจกรรมกลุ่ม/Lab/Presentation/Project] ระดับ: [ม.ปลาย] วิธีบันทึก: [Checklist/Rating/Anecdotal]",
+    steps:"1. กำหนด Observable Behaviors อย่างเฉพาะเจาะจง\n2. เลือก Recording Format ที่เหมาะกับบริบท\n3. เขียน Behavioral Indicators แต่ละระดับ\n4. ออกแบบ Recording Sheet ที่ใช้งานได้จริง\n5. สร้าง Sampling Strategy\n6. กำหนดวิธีแปลผลและ Follow-up Action",
+    expect:"แบบสังเกตพฤติกรรมฉบับสมบูรณ์ มี Behavioral Indicators, Recording Sheet, Sampling Plan, Interpretation Guide และ Follow-up Action Plan"
+  },
+  {
+    id:72, cat:"4",
+    title:"สร้าง Formative Assessment เพื่อติดตามการเรียนรู้ระหว่างสอน",
+    desc:"ออกแบบ Formative Assessment ที่หลากหลายสำหรับตรวจสอบความเข้าใจระหว่างเรียน",
+    role:"คุณคือผู้เชี่ยวชาญ Formative Assessment ที่มีความรู้ลึกในงานของ Dylan Wiliam และ John Hattie ว่าด้วย Assessment for Learning ในบริบทห้องเรียน STEM",
+    input:"เนื้อหาที่สอน: [หัวข้อ] ช่วงเวลา: [ต้น/กลาง/ท้ายชั่วโมง] รูปแบบที่ต้องการ: [Exit Ticket/Think-Pair-Share/Quick Quiz/Thumbs/Whiteboard] เวลา: [นาที]",
+    steps:"1. กำหนด Learning Intention และ Success Criteria\n2. ออกแบบ Check Question ที่เปิดเผย Misconception\n3. เลือก Collection Method ที่ให้ข้อมูล 100% ของชั้น\n4. วางแผน Feedback Response สำหรับผลที่เป็นไปได้\n5. ออกแบบ Differentiated Follow-up\n6. สร้าง Record-keeping System",
+    expect:"Formative Assessment Toolkit 5-8 เทคนิค พร้อม Implementation Guide แต่ละเทคนิค, Sample Questions, Feedback Response Matrix และ Record-keeping Template"
+  },
+  {
+    id:73, cat:"4",
+    title:"สร้างแบบประเมินตนเองและประเมินเพื่อน (Self & Peer Assessment)",
+    desc:"ออกแบบเครื่องมือ Self-Assessment และ Peer Assessment สำหรับวิชาเทคโนโลยี",
+    role:"คuณคือผู้เชี่ยวชาญ Self-Regulated Learning และ Peer Assessment ที่มีประสบการณ์ออกแบบเครื่องมือประเมินตนเองและประเมินเพื่อนที่นักเรียนใช้ได้อย่างมีประสิทธิผล",
+    input:"งาน/ทักษะที่ประเมิน: [ระบุ] รูปแบบ: [Self-Assessment/Peer Assessment/360] Criteria: [ระบุหรือให้แนะนำ] ระดับ: [ม.ปลาย] วัตถุประสงค์: [Grade/Improvement/Reflection]",
+    steps:"1. กำหนด Assessment Criteria ที่นักเรียนเข้าใจได้\n2. ออกแบบ Rating Scale ที่เหมาะสม\n3. สร้าง Reflection Prompts เพื่อ Deep Thinking\n4. ออกแบบ Protocol ป้องกัน Bias\n5. กำหนดวิธีใช้ผลในการพัฒนา\n6. สร้าง Calibration Activity",
+    expect:"แบบประเมินตนเองและประเมินเพื่อน พร้อม Criteria Checklist, Reflection Prompts, Anti-Bias Protocol, Calibration Activity และ Teacher Guide การนำไปใช้"
+  },
+  {
+    id:74, cat:"4",
+    title:"ออกแบบข้อสอบ PISA-Style วิชาเทคโนโลยีและวิทยาศาสตร์",
+    desc:"สร้างข้อสอบรูปแบบ PISA ที่วัดสมรรถนะการอ่านและแก้ปัญหาบริบทเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ PISA Framework ที่มีประสบการณ์ออกแบบข้อสอบ Scenario-Based ในบริบทเทคโนโลยีสำหรับนักเรียนมัธยมไทย",
+    input:"สมรรถนะที่วัด: [Scientific Literacy/Digital Literacy/Problem Solving] Scenario: [บริบทไทย/โลก] ระดับ: [ม.ปลาย] จำนวนข้อ: [จำนวน] ประเภทคำถาม: [MCQ/Short Answer/Extended]",
+    steps:"1. ออกแบบ Authentic Stimulus Text/Scenario ที่เชื่อมโยงกับชีวิตจริง\n2. เขียนคำถาม 3-5 ข้อต่อ Scenario ระดับต่างๆ\n3. กำหนด Cognitive Demand แต่ละข้อ\n4. ตรวจสอบ Cultural Fairness\n5. สร้าง Scoring Guide\n6. Align กับ PISA Proficiency Levels",
+    expect:"ข้อสอบ PISA-Style ครบชุด ประกอบด้วย Scenario Text, Question Set, Difficulty Map, Scoring Guide และ Proficiency Level Description"
+  },
+  {
+    id:75, cat:"4",
+    title:"สร้างข้อสอบปฏิบัติ (Practical Test) คอมพิวเตอร์/เทคโนโลยี",
+    desc:"ออกแบบข้อสอบปฏิบัติที่วัดทักษะจริงในวิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Performance-Based Assessment และ Practical Skills Testing ที่มีประสบการณ์ออกแบบการทดสอบปฏิบัติที่วัดทักษะคอมพิวเตอร์และเทคโนโลยีได้อย่างตรงเป้า",
+    input:"ทักษะที่ทดสอบ: [Coding/Software/Hardware/Design/Data] Software ที่ใช้: [ระบุ] ระดับ: [ม.ปลาย] เวลา: [นาที] คะแนนรวม: [จำนวน] สภาพแวดล้อม: [Lab/Online/BYOD]",
+    steps:"1. กำหนด Skills Checklist ที่จะวัด\n2. ออกแบบ Task Brief ที่สมจริง\n3. กำหนด Step-by-step Scoring Criteria\n4. ออกแบบ Proctor Guide\n5. วางแผน Technical Contingencies\n6. สร้าง Rubric สำหรับ Open-Ended Tasks",
+    expect:"Practical Test Package ประกอบด้วย Task Brief, Skills Checklist, Scoring Rubric, Proctor Guide, Technical Requirements และ Sample Solution/Output"
+  },
+  {
+    id:76, cat:"4",
+    title:"สร้างแบบทดสอบ Diagnostic เพื่อวัด Prior Knowledge เทคโนโลยี",
+    desc:"ออกแบบแบบทดสอบวินิจฉัยความรู้พื้นฐานก่อนสอนหน่วยใหม่",
+    role:"คุณคือผู้เชี่ยวชาญ Diagnostic Assessment ที่ช่วยครูค้นพบ Prior Knowledge และ Misconceptions ของนักเรียนก่อนเริ่มหน่วยการเรียนรู้ใหม่",
+    input:"หน่วยการเรียนรู้ที่จะสอน: [ระบุ] ความรู้พื้นฐานที่ต้องการวัด: [ระบุ] Misconceptions ที่รู้จักไว้แล้ว: [ระบุหากมี] รูปแบบ: [Quick Quiz/KWL/Concept Mapping/Drawing]",
+    steps:"1. กำหนด Prior Knowledge ที่สำคัญที่สุด\n2. ระบุ Misconceptions ที่พบบ่อยในหัวข้อนี้\n3. ออกแบบ Diagnostic Questions เปิดเผย Misconceptions\n4. สร้าง Easy Scoring System\n5. วางแผน Instructional Response ตาม Diagnostic Results\n6. ออกแบบ Follow-up Differentiation",
+    expect:"Diagnostic Assessment ครบชุด ประกอบด้วย Question Set, Common Misconceptions Checklist, Quick Scoring Guide, Instructional Response Matrix และ Differentiation Plan"
+  },
+  {
+    id:77, cat:"4",
+    title:"ออกแบบ Portfolio Assessment สำหรับวิชาเทคโนโลยี ม.ปลาย",
+    desc:"สร้างระบบประเมิน Portfolio แสดงพัฒนาการและผลงานวิชาเทคโนโลยี",
+    role:"คuณคือผู้เชี่ยวชาญ Portfolio Assessment ที่มีประสบการณ์ออกแบบระบบประเมิน Portfolio ที่สะท้อนการเรียนรู้อย่างแท้จริงและใช้งานได้จริงในโรงเรียนไทย",
+    input:"วิชา/หน่วยเรียนรู้: [ระบุ] ประเภท Portfolio: [Working/Showcase/Reflective/Best Work] ชิ้นงานที่รวบรวม: [ระบุ] ระยะเวลา: [ภาคเรียน] คะแนนสัดส่วน: [ระบุ]",
+    steps:"1. กำหนด Portfolio Purpose และ Core Requirements\n2. ออกแบบ Portfolio Structure\n3. กำหนด Mandatory + Choice Artifacts\n4. สร้าง Reflection Templates\n5. ออกแบบ Portfolio Conference Protocol\n6. สร้าง Holistic Scoring Rubric",
+    expect:"Portfolio Assessment System ครบถ้วน ประกอบด้วย Requirements Sheet, Artifact Menu, Reflection Templates, Conference Protocol, Holistic Rubric และ Parent Communication Template"
+  },
+  {
+    id:78, cat:"4",
+    title:"สร้างแบบประเมินทักษะการนำเสนอผลงาน (Presentation Skills)",
+    desc:"ออกแบบ Rubric ประเมินการนำเสนองานวิชาเทคโนโลยีอย่างครอบคลุม",
+    role:"คุณคือผู้เชี่ยวชาญ Oral Communication Assessment ที่มีประสบการณ์ออกแบบ Rubrics ประเมินการนำเสนอที่สมดุลระหว่างเนื้อหา ทักษะการพูด และ Visual Aids",
+    input:"งานนำเสนอ: [ระบุหัวข้อ/Project] รูปแบบ: [Solo/Group] ระยะเวลา: [นาที] ระดับ: [ม.ปลาย] Dimensions ที่วัด: [Content/Delivery/Visual/Q&A] คะแนนรวม: [จำนวน]",
+    steps:"1. กำหนด Presentation Dimensions 4-6 ด้าน\n2. กำหนด Levels (Exceeds/Meets/Approaching/Beginning)\n3. เขียน Behavioral Descriptors แต่ละ Cell\n4. สร้าง Peer Evaluation Form ย่อ\n5. ออกแบบ Q&A Assessment Protocol\n6. สร้าง Feedback Form สำหรับนักเรียน",
+    expect:"Presentation Rubric แบบ Analytic ครบทุก Dimension, Peer Evaluation Form, Q&A Assessment Protocol, Student Self-Prep Checklist และ Written Feedback Template"
+  },
+  {
+    id:79, cat:"4",
+    title:"สร้างแบบทดสอบอิงเกณฑ์ (Criterion-Referenced Test) วิชาเทคโนโลยี",
+    desc:"ออกแบบแบบทดสอบที่วัดว่านักเรียนผ่านเกณฑ์มาตรฐานที่กำหนดหรือไม่",
+    role:"คุณคือผู้เชี่ยวชาญ Criterion-Referenced Testing ที่มีความรู้ด้านการกำหนด Cut Score, Standard Setting และการออกแบบ CRT ที่มีความเที่ยงตรง",
+    input:"มาตรฐาน/ตัวชี้วัด: [ระบุ] เกณฑ์ผ่าน: [จำนวนข้อหรือ %] จำนวนข้อ: [จำนวน] ประเภทข้อ: [MCQ/Short Answer/Performance] ระดับ: [ม.ปลาย]",
+    steps:"1. Map ข้อสอบแต่ละข้อกับตัวชี้วัดที่กำหนด\n2. กำหนด Minimum Competency ที่ต้องผ่าน\n3. เขียนข้อสอบที่วัดตัวชี้วัดได้ตรง\n4. กำหนด Mastery Score Rationale\n5. ออกแบบ Remediation Plan สำหรับไม่ผ่าน\n6. สร้าง Score Interpretation Guide",
+    expect:"CRT ฉบับสมบูรณ์ พร้อม Standards Alignment Table, Mastery Cutoff Rationale, Item Bank 20+ ข้อ, Score Interpretation Guide และ Remediation Activity Plan"
+  },
+  {
+    id:80, cat:"4",
+    title:"ออกแบบ Summative Assessment ปิดหน่วยวิชาเทคโนโลยี",
+    desc:"สร้างการประเมินสรุปผลปลายหน่วยที่วัดครอบคลุมและสมดุล",
+    role:"คุณคือผู้เชี่ยวชาญการออกแบบ Summative Assessment ที่ใช้วิธีการหลากหลายครอบคลุมทุกระดับ Bloom's และสอดคล้องกับจุดประสงค์การเรียนรู้",
+    input:"หน่วยการเรียนรู้: [ระบุ] มาตรฐาน/ตัวชี้วัด: [ระบุ] คะแนนรวม: [จำนวน] รูปแบบ: [Test Only/Mixed/Performance+Test] เวลา: [ชั่วโมง]",
+    steps:"1. วิเคราะห์ Learning Outcomes ทั้งหมดของหน่วย\n2. สร้าง Assessment Blueprint ครอบคลุมทุก Outcome\n3. กำหนดสัดส่วน Test/Performance Task\n4. สร้างข้อสอบและ Performance Task\n5. สร้าง Scoring Guide ครบทุกส่วน\n6. ออกแบบ Score Reporting",
+    expect:"Summative Assessment Package ครบชุด ประกอบด้วย Assessment Blueprint, Test Paper, Performance Task Brief, Scoring Guides ทุกส่วน และ Score Reporting Template"
+  },
+  {
+    id:81, cat:"4",
+    title:"สร้างแบบประเมินความสามารถด้าน Digital Literacy",
+    desc:"ออกแบบเครื่องมือวัด Digital Literacy Skills ของนักเรียน ม.ปลาย",
+    role:"คุณคือผู้เชี่ยวชาญ Digital Literacy Assessment ที่มีความรู้ตาม ISTE Student Standards, UNESCO Digital Literacy Framework และบริบทการศึกษาไทย",
+    input:"Digital Literacy Domains: [Information/Communication/Content Creation/Safety/Problem-solving] ระดับ: [ม.ปลาย] รูปแบบ: [Self-Assessment/Performance/Written] วัตถุประสงค์: [Baseline/Progress/Certificate]",
+    steps:"1. กำหนด Digital Literacy Competencies ตาม Framework\n2. ออกแบบ Assessment ที่วัดได้จริง (Performance-based)\n3. สร้าง Levels: Emerging/Developing/Proficient/Advanced\n4. ออกแบบ Authentic Tasks แต่ละ Domain\n5. สร้าง Digital Skills Profile\n6. ออกแบบ Self-Directed Learning Path",
+    expect:"Digital Literacy Assessment Framework ครบ ประกอบด้วย Competency Matrix, Performance Tasks แต่ละ Domain, Proficiency Level Descriptors, Skills Profile Template และ Learning Path"
+  },
+  {
+    id:82, cat:"4",
+    title:"สร้างข้อสอบ Computational Thinking วัดทักษะการคิด",
+    desc:"ออกแบบข้อสอบวัด CT Skills: Decomposition, Pattern, Abstraction, Algorithm",
+    role:"คุณคือผู้เชี่ยวชาญ Computational Thinking Assessment ที่มีความรู้ตาม Bebras/CSTA Standards และออกแบบข้อสอบวัด CT ที่ไม่จำเป็นต้องใช้คอมพิวเตอร์",
+    input:"CT Skill ที่วัด: [Decomposition/Pattern Recognition/Abstraction/Algorithm] ระดับ: [ม.ปลาย] รูปแบบ: [ปรนัย/อัตนัย/ปฏิบัติ] จำนวน: [ข้อ] Unplugged/Digital: [ระบุ]",
+    steps:"1. สร้าง CT Task ที่วัดแต่ละทักษะอย่างชัดเจน\n2. ออกแบบ Context ที่ไม่ต้องการความรู้โปรแกรมมิ่ง\n3. กำหนดระดับความยากตาม Bebras Scale\n4. สร้าง Model Solutions\n5. ออกแบบ Partial Credit Scoring\n6. สร้าง Teacher Scoring Guide",
+    expect:"CT Assessment ครบ 4 Skills ประกอบด้วย Tasks หลากระดับ Model Solutions, Partial Credit Rubric, Scoring Guide และ Common Error Analysis"
+  },
+  {
+    id:83, cat:"4",
+    title:"ออกแบบแบบประเมินโครงงานเทคโนโลยี (Technology Project Rubric)",
+    desc:"สร้าง Rubric ประเมินโครงงานเทคโนโลยีที่ครอบคลุมทั้งกระบวนการและผลผลิต",
+    role:"คุณคือผู้เชี่ยวชาญการประเมิน Project-Based Learning ที่มีประสบการณ์ออกแบบ Rubrics ประเมินโครงงานเทคโนโลยีที่สมดุลระหว่าง Process และ Product",
+    input:"ประเภทโครงงาน: [Website/App/IoT/AI/Data Analysis/Video Production] ระดับ: [ม.ปลาย] ระยะเวลา: [สัปดาห์] คะแนนรวม: [จำนวน] เน้นประเมิน: [กระบวนการ/ผลผลิต/ทั้งสอง]",
+    steps:"1. กำหนด Assessment Dimensions: Process + Product + Presentation\n2. กำหนดน้ำหนักแต่ละ Dimension\n3. เขียน Performance Descriptors 4 ระดับ\n4. สร้าง Milestone Checkpoints Assessment\n5. ออกแบบ Team Collaboration Assessment\n6. สร้าง Student Self-Assessment Version",
+    expect:"Project Rubric ฉบับสมบูรณ์แบบ Analytic มี Process + Product + Presentation Dimensions, Milestone Assessment Checklist, Team Rubric และ Student Self-Assessment"
+  },
+  {
+    id:84, cat:"4",
+    title:"สร้างแบบสอบถามวัดความเข้าใจที่คลาดเคลื่อน (Misconception Probe)",
+    desc:"ออกแบบ Diagnostic Questions เพื่อเปิดเผย Misconceptions ในวิชาเทคโนโลยี",
+    role:"คuณคือผู้เชี่ยวชาญ Conceptual Change Teaching และ Misconception Research ที่มีความรู้ Misconceptions ที่พบบ่อยในวิชา CS/IT และออกแบบข้อสอบ Probe ที่เปิดเผยได้ตรง",
+    input:"หัวข้อ: [เนื้อหาเทคโนโลยี] Misconceptions ที่ทราบแล้ว: [ระบุ/ให้ AI ระบุ] รูปแบบ: [Two-tier MCQ/CRI/Predict-Observe-Explain] ระดับ: [ม.ปลาย]",
+    steps:"1. ระบุ Misconceptions ที่พบบ่อยในหัวข้อ\n2. ออกแบบ Probe Questions ที่ดึง Misconception ออกมา\n3. สร้าง Two-Tier Format (Correct Answer + Confidence + Reason)\n4. ออกแบบ Analysis Guide ระบุ Misconception ชนิด\n5. สร้าง Conceptual Change Lessons เพื่อแก้ไข",
+    expect:"Misconception Probe ชุดครบ ประกอบด้วย Common Misconceptions List, Probe Questions, Two-Tier Format, Analysis Scoring Guide และ Remediation Activity สำหรับแต่ละ Misconception"
+  },
+  {
+    id:85, cat:"4",
+    title:"ออกแบบ Quiz Generator สำหรับ Google Forms / Microsoft Forms",
+    desc:"สร้างข้อสอบ Auto-grading ใน Google/Microsoft Forms ที่มีประสิทธิภาพ",
+    role:"คุณคือผู้เชี่ยวชาญ EdTech และ Digital Assessment ที่มีประสบการณ์ออกแบบ Quiz ใน Google Forms, Microsoft Forms และ Quizlet พร้อม Features Auto-grading และ Analytics",
+    input:"หัวข้อ: [เนื้อหา] จำนวนข้อ: [จำนวน] ประเภทข้อ: [MCQ/Short/Long/Check/Scale] Platform: [Google Forms/Microsoft Forms] Features: [Randomize/Timer/Feedback/Analytics]",
+    steps:"1. ออกแบบ Question Types ที่หลากหลายสำหรับ Platform\n2. เขียนคำถามพร้อม Answer Key\n3. กำหนด Feedback Message ทั้ง Correct และ Incorrect\n4. วางแผนการใช้ Branching Logic\n5. กำหนด Analytics ที่ต้องการติดตาม\n6. สร้าง Score Reporting Template",
+    expect:"Quiz Content Package สมบูรณ์ ประกอบด้วย Question Set + Answer Keys, Feedback Messages, Setup Instructions สำหรับ Platform, Analytics Tracking Guide และ Score Reporting Template"
+  },
+  {
+    id:86, cat:"4",
+    title:"สร้างแบบประเมินทักษะการทำงานเป็นทีม (Teamwork Assessment)",
+    desc:"ออกแบบ Rubric วัดทักษะการทำงานร่วมกันในโครงงานกลุ่มวิชาเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Collaborative Learning Assessment ที่มีประสบการณ์ออกแบบเครื่องมือวัด Teamwork Skills ที่ยุติธรรมและแสดงการมีส่วนร่วมจริงของแต่ละคน",
+    input:"งานกลุ่ม: [ระบุโครงงาน] จำนวนสมาชิก: [2-3/4-5] ระยะเวลา: [สัปดาห์] Teamwork Dimensions: [Communication/Leadership/Contribution/Conflict Resolution] คะแนน: [สัดส่วน]",
+    steps:"1. กำหนด Teamwork Competencies ที่จะวัด\n2. ออกแบบ Peer Assessment Form ป้องกัน Popularity Bias\n3. สร้าง Team Log สำหรับ Document Contributions\n4. ออกแบบ Teacher Observation Rubric\n5. กำหนดวิธีผสม Self/Peer/Teacher Assessment\n6. สร้าง Conflict Resolution Protocol",
+    expect:"Teamwork Assessment Package ประกอบด้วย Teacher Rubric, Peer Assessment Form, Team Log Template, Contribution Documentation System, Score Calculation Guide และ Conflict Protocol"
+  },
+  {
+    id:87, cat:"4",
+    title:"ออกแบบ Competency-Based Assessment ทักษะดิจิทัลสำหรับ ม.ปลาย",
+    desc:"สร้างระบบประเมินสมรรถนะดิจิทัลตามมาตรฐานที่กำหนด",
+    role:"คุณคือผู้เชี่ยวชาญ Competency-Based Education ที่มีความรู้ตาม ISTE Standards, DigComp Framework และบริบททักษะดิจิทัลที่นายจ้างในไทยต้องการ",
+    input:"Competency Framework: [ISTE/DigComp/สพฐ./กำหนดเอง] Competencies ที่ประเมิน: [ระบุ] ระดับสมรรถนะ: [Basic/Intermediate/Advanced] หลักฐาน: [ผลงาน/การสาธิต/การทดสอบ]",
+    steps:"1. Map Competencies กับ Standards Framework\n2. กำหนด Proficiency Levels และ Descriptors\n3. ออกแบบ Evidence Collection Methods\n4. สร้าง Competency Matrix\n5. ออกแบบ Badge/Certification System\n6. วางแผน Skills Gap Analysis",
+    expect:"Competency-Based Assessment System ประกอบด้วย Competency Matrix, Proficiency Descriptors, Evidence Collection Methods, Badge Criteria, Skills Gap Analysis Template และ Learning Pathway"
+  },
+  {
+    id:88, cat:"4",
+    title:"สร้างแบบทดสอบวัดทัศนคติต่อเทคโนโลยีและการเรียนรู้",
+    desc:"ออกแบบเครื่องมือวัดทัศนคติ แรงจูงใจ และ Growth Mindset ด้านเทคโนโลยี",
+    role:"คุณคือผู้เชี่ยวชาญ Affective Domain Assessment และนักจิตวิทยาการศึกษาที่มีประสบการณ์สร้างเครื่องมือวัดทัศนคติต่อเทคโนโลยีที่มีความเชื่อมั่นสูง",
+    input:"ทัศนคติที่ต้องการวัด: [Technology Anxiety/Self-Efficacy/Growth Mindset/Motivation/Engagement] กลุ่มเป้าหมาย: [นักเรียน ม.ปลาย] บริบท: [วิชาเทคโนโลยี/Coding/ใช้ AI] จุดประสงค์: [วิจัย/ปรับการสอน]",
+    steps:"1. กำหนด Construct ทัศนคติที่ต้องการวัดอย่างชัดเจน\n2. ออกแบบ Likert Scale Items\n3. รวม Reverse-scored Items เพื่อลด Response Bias\n4. หา Content Validity ด้วย Expert Review\n5. วางแผน Pilot Testing\n6. ออกแบบการวิเคราะห์และการตีความ",
+    expect:"แบบสอบถามทัศนคติ 20-30 ข้อ พร้อม Construct Table, Reverse Items, Scoring Instructions, Reliability Plan, Score Interpretation Guide และ Action Plan ตามระดับทัศนคติ"
+  },
+  {
+    id:89, cat:"4",
+    title:"สร้างข้อสอบ Coding/Algorithm ระดับ ม.ปลาย",
+    desc:"ออกแบบข้อสอบวัดทักษะการเขียนโปรแกรมและ Algorithm ระดับมัธยมปลาย",
+    role:"คuณคือผู้ออกแบบข้อสอบ CS Education ที่มีประสบการณ์สร้างโจทย์ Coding/Algorithm สำหรับ SESA/สอวน./Bebras ที่วัดทักษะได้ตรงและยุติธรรม",
+    input:"ภาษาโปรแกรม: [Python/Scratch/Pseudocode/Flowchart] ทักษะ: [Loop/Function/Array/Sorting/Recursion] ระดับ: [ม.ปลาย] จำนวนข้อ: [จำนวน] ประเภท: [Code Reading/Trace/Debugging/Write Code]",
+    steps:"1. กำหนด Task Types ที่หลากหลาย\n2. เขียนโจทย์ Code Reading ระดับต่ำ → สูง\n3. สร้างโจทย์ Debugging ที่มี Errors จริง\n4. ออกแบบโจทย์ Algorithm Design\n5. สร้าง Model Solutions พร้อม Explanation\n6. กำหนด Partial Credit Scoring",
+    expect:"Coding Assessment ครบชุด ประกอบด้วย Code Reading Tasks, Trace Exercises, Debug Challenges, Algorithm Design Problems, Model Solutions และ Partial Credit Rubric"
+  },
+  {
+    id:90, cat:"4",
+    title:"ออกแบบแบบรายงานผลการประเมินและ Feedback ให้ผู้ปกครอง",
+    desc:"สร้างรูปแบบรายงานผลที่สื่อสารความก้าวหน้าวิชาเทคโนโลยีให้ผู้ปกครองเข้าใจ",
+    role:"คุณคือผู้เชี่ยวชาญ Parent Communication และ Assessment Reporting ที่มีประสบการณ์ออกแบบรายงานผลที่ผู้ปกครองทุกระดับการศึกษาเข้าใจได้และนำไปสนับสนุนลูกได้จริง",
+    input:"ข้อมูลที่ต้องรายงาน: [คะแนน/ทักษะ/พฤติกรรม/ความก้าวหน้า] กลุ่มผู้ปกครอง: [การศึกษาหลากหลาย] ช่องทาง: [เอกสาร/LINE/Email/ประชุม] ความถี่: [รายสัปดาห์/เดือน/ภาคเรียน]",
+    steps:"1. กำหนดข้อมูลสำคัญที่ผู้ปกครองต้องรู้\n2. แปลงภาษาวิชาการเป็นภาษาผู้ปกครอง\n3. ออกแบบ Visual Dashboard ที่อ่านง่าย\n4. สร้าง Strength/Growth/Support Sections\n5. กำหนด Action Items สำหรับผู้ปกครอง\n6. ออกแบบ Follow-up Communication Protocol",
+    expect:"Parent Report Template ที่สมบูรณ์ ประกอบด้วย Dashboard Visual, Strength/Growth/Support Sections, Parent-Friendly Language Guide, Action Items List และ Follow-up Protocol"
+  }
+];
+
+// ─── STATE ───
+let currentFilter = 'all';
+let currentPrompt = null;
+
+// ─── RENDER ───
+function renderCards() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const grid = document.getElementById('grid');
+  const filtered = PROMPTS.filter(p => {
+    const matchCat = currentFilter === 'all' || p.cat === currentFilter;
+    const matchSearch = !query || p.title.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query);
+    return matchCat && matchSearch;
+  });
+
+  document.getElementById('statsBar').textContent = `แสดง ${filtered.length} / ${PROMPTS.length} prompts`;
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty">🔍 ไม่พบ prompt ที่ตรงกับการค้นหา</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="card" data-cat="${p.cat}" onclick="openModal(${p.id})">
+      <span class="card-num">#${String(p.id).padStart(2,'0')}</span>
+      <div class="card-badge">${CAT_NAMES[p.cat]}</div>
+      <div class="card-title">${p.title}</div>
+      <div class="card-desc">${p.desc}</div>
+    </div>
+  `).join('');
+}
+
+function setFilter(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+function filterCards() { renderCards(); }
+
+// ─── MODAL ───
+function openModal(id) {
+  const p = PROMPTS.find(x => x.id === id);
+  if (!p) return;
+  currentPrompt = p;
+
+  const badge = document.getElementById('modalBadge');
+  badge.innerHTML = `<span class="card-badge" style="display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;font-family:'IBM Plex Mono',monospace;padding:2px 8px;border-radius:4px;">${CAT_NAMES[p.cat]}</span>`;
+
+  // Set badge bg by cat
+  const colors = {'1':'rgba(79,142,247,.15)','2':'rgba(56,201,160,.15)','3':'rgba(244,161,53,.15)','4':'rgba(224,92,122,.15)'};
+  const textColors = {'1':'#4f8ef7','2':'#38c9a0','3':'#f4a135','4':'#e05c7a'};
+  badge.querySelector('.card-badge').style.background = colors[p.cat];
+  badge.querySelector('.card-badge').style.color = textColors[p.cat];
+
+  document.getElementById('modalTitle').textContent = p.title;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="rise-block">
+      <div class="rise-label">R — ROLE : บทบาท AI</div>
+      <div class="rise-content">${p.role}</div>
+    </div>
+    <div class="rise-block">
+      <div class="rise-label">I — INPUT : ข้อมูลที่ต้องเตรียม</div>
+      <div class="rise-content">${p.input}</div>
+    </div>
+    <div class="rise-block">
+      <div class="rise-label">S — STEPS : ขั้นตอนการทำงาน</div>
+      <div class="rise-content">${p.steps}</div>
+    </div>
+    <div class="rise-block">
+      <div class="rise-label">E — EXPECTATION : ผลลัพธ์ที่ต้องการ</div>
+      <div class="rise-content">${p.expect}</div>
+    </div>
+  `;
+
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.textContent = '📋 คัดลอก Prompt';
+  copyBtn.classList.remove('copied');
+
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOutside(e) {
+  if (e.target.id === 'overlay') closeModal();
+}
+
+function copyPrompt() {
+  if (!currentPrompt) return;
+  const p = currentPrompt;
+  const text = `**RISE Prompt: ${p.title}**\n\n**R – Role (บทบาท AI)**\n${p.role}\n\n**I – Input (ข้อมูลที่ต้องเตรียม)**\n${p.input}\n\n**S – Steps (ขั้นตอน)**\n${p.steps}\n\n**E – Expectation (ผลลัพธ์)**\n${p.expect}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ คัดลอกแล้ว!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 คัดลอก Prompt';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ─── DOWNLOAD ───
+function downloadHTML() {
+  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'RISE_PromptLibrary_TeacherTech_90.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ─── INIT ───
+renderCards();
+</script>
+</body>
+</html>
